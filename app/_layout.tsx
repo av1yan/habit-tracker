@@ -100,6 +100,7 @@ function Navigator() {
         <Stack.Screen name="habit/[id]" />
         <Stack.Screen name="reminders" />
         <Stack.Screen name="reminder-edit" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="streak-freeze" />
       </Stack>
     </>
   )
