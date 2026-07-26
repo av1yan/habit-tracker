@@ -311,6 +311,11 @@ function MonthGrid({
   )
 }
 
+const CELL = 13
+const CELL_PITCH = CELL + 3 // cell + row/col gap
+const WDAY_COL = 26 // left gutter for weekday labels
+const WDAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''] // Sun..Sat, GitHub-style
+
 function Heatmap({
   today,
   counts,
@@ -323,42 +328,89 @@ function Heatmap({
   onSelect: (d: string) => void
 }) {
   const start = addDays(startOfWeek(today, 0), -((WEEKS - 1) * 7))
+
+  // Month labels above the column where each new month begins.
+  const monthLabels: { x: number; label: string }[] = []
+  let prevMonth = ''
+  for (let w = 0; w < WEEKS; w++) {
+    const d = addDays(start, w * 7)
+    const m = monthOf(d)
+    if (m !== prevMonth) {
+      prevMonth = m
+      const [y, mm] = d.split('-').map(Number)
+      monthLabels.push({ x: w * CELL_PITCH, label: new Date(y, mm - 1, 1).toLocaleDateString(undefined, { month: 'short' }) })
+    }
+  }
+
+  const values = [...counts.values()]
+  const activeDays = values.filter((v) => v > 0).length
+  const checkins = values.reduce((a, b) => a + b, 0)
+
   return (
     <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 16 }}>
-      <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.muted, marginBottom: 12 }}>
-        LAST {WEEKS} WEEKS
-      </Text>
-      <View style={{ flexDirection: 'row', gap: 3 }}>
-        {Array.from({ length: WEEKS }, (_, w) => (
-          <View key={w} style={{ gap: 3 }}>
-            {Array.from({ length: 7 }, (_, d) => {
-              const date = addDays(start, w * 7 + d)
-              const future = date > today
-              const n = counts.get(date) ?? 0
-              const isSelected = date === selected
-              return (
-                <Pressable
-                  key={d}
-                  disabled={future}
-                  onPress={() => onSelect(date)}
-                  hitSlop={2}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${formatDay(date)}, ${n} completed`}
-                  accessibilityState={{ selected: isSelected }}
-                  style={{
-                    width: 13,
-                    height: 13,
-                    borderRadius: 3,
-                    backgroundColor: future ? 'transparent' : heat[level(n)],
-                    borderWidth: isSelected ? 2 : 0,
-                    borderColor: colors.ink,
-                  }}
-                />
-              )
-            })}
-          </View>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
+        <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.muted }}>LAST {WEEKS} WEEKS</Text>
+        <Text style={{ fontSize: 12, fontFamily: fonts.semibold, color: colors.sub }}>
+          {activeDays} active {activeDays === 1 ? 'day' : 'days'} · {checkins} check-in{checkins === 1 ? '' : 's'}
+        </Text>
+      </View>
+
+      {/* Month labels */}
+      <View style={{ height: 14, marginLeft: WDAY_COL }}>
+        {monthLabels.map((m) => (
+          <Text
+            key={m.label + m.x}
+            style={{ position: 'absolute', left: m.x, fontSize: 10, color: colors.muted }}
+          >
+            {m.label}
+          </Text>
         ))}
       </View>
+
+      <View style={{ flexDirection: 'row' }}>
+        {/* Weekday labels */}
+        <View style={{ width: WDAY_COL, gap: 3 }}>
+          {WDAY_LABELS.map((w, i) => (
+            <View key={i} style={{ height: CELL, justifyContent: 'center' }}>
+              <Text style={{ fontSize: 9, color: colors.muted }}>{w}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Grid */}
+        <View style={{ flexDirection: 'row', gap: 3 }}>
+          {Array.from({ length: WEEKS }, (_, w) => (
+            <View key={w} style={{ gap: 3 }}>
+              {Array.from({ length: 7 }, (_, d) => {
+                const date = addDays(start, w * 7 + d)
+                const future = date > today
+                const n = counts.get(date) ?? 0
+                const isSelected = date === selected
+                return (
+                  <Pressable
+                    key={d}
+                    disabled={future}
+                    onPress={() => onSelect(date)}
+                    hitSlop={2}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${formatDay(date)}, ${n} completed`}
+                    accessibilityState={{ selected: isSelected }}
+                    style={{
+                      width: CELL,
+                      height: CELL,
+                      borderRadius: 3,
+                      backgroundColor: future ? 'transparent' : heat[level(n)],
+                      borderWidth: isSelected ? 2 : 0,
+                      borderColor: colors.ink,
+                    }}
+                  />
+                )
+              })}
+            </View>
+          ))}
+        </View>
+      </View>
+
       <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', marginTop: 12, justifyContent: 'flex-end' }}>
         <Text style={{ fontSize: 10, color: colors.muted }}>Less</Text>
         {heat.map((c) => (
