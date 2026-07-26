@@ -4,6 +4,7 @@ import { stats as statsRepo } from '@backend/local'
 import { addDays, startOfWeek, toLocalISODate } from '@backend/data'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
+import { Loading } from '@/components/ScreenState'
 import { colors, fonts, heat } from '@/lib/theme'
 
 const WEEKS = 15
@@ -11,7 +12,7 @@ const WEEKS = 15
 export default function Calendar() {
   useTheme()
   const insets = useSafeAreaInsets()
-  const { data } = useLocalData((l) => statsRepo.recentHeatmap(l, WEEKS))
+  const { data, loading } = useLocalData((l) => statsRepo.recentHeatmap(l, WEEKS))
 
   const counts = new Map((data ?? []).map((c) => [c.log_date, c.completions]))
   const today = toLocalISODate()
@@ -32,6 +33,9 @@ export default function Calendar() {
         <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.muted, marginBottom: 12 }}>
           LAST {WEEKS} WEEKS
         </Text>
+        {loading ? (
+          <Loading />
+        ) : (
         <View style={{ flexDirection: 'row', gap: 3 }}>
           {Array.from({ length: WEEKS }, (_, w) => (
             <View key={w} style={{ gap: 3 }}>
@@ -54,6 +58,7 @@ export default function Calendar() {
             </View>
           ))}
         </View>
+        )}
         <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', marginTop: 12, justifyContent: 'flex-end' }}>
           <Text style={{ fontSize: 10, color: colors.muted }}>Less</Text>
           {heat.map((c) => (

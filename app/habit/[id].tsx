@@ -6,6 +6,7 @@ import { habits as habitsRepo, logs as logsRepo, stats as statsRepo, freezes as 
 import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
+import { EmptyState, Loading } from '@/components/ScreenState'
 import { colors, fonts, rgba } from '@/lib/theme'
 
 export default function HabitDetail() {
@@ -15,7 +16,7 @@ export default function HabitDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const { local, refresh } = useApp()
 
-  const { data } = useLocalData(async (l) => {
+  const { data, loading } = useLocalData(async (l) => {
     const habit = await habitsRepo.getHabit(l, id)
     const all = await statsRepo.getAllStats(l)
     const week = await logsRepo.getWeek(l, id)
@@ -28,8 +29,22 @@ export default function HabitDetail() {
     if (data?.note !== undefined) setNote(data.note)
   }, [data?.note])
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <Loading />
+      </View>
+    )
+  }
   if (!data?.habit) {
-    return <View style={{ flex: 1, backgroundColor: colors.bg }} />
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: insets.top + 8 }}>
+        <Pressable onPress={() => router.back()} hitSlop={8} style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
+          <Text style={{ color: colors.accent, fontFamily: fonts.bold, fontSize: 15 }}>‹ Back</Text>
+        </Pressable>
+        <EmptyState icon="🔍" title="Habit not found" subtitle="It may have been deleted." />
+      </View>
+    )
   }
   const { habit, stat, week } = data
   const color = habit.color

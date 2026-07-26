@@ -3,12 +3,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { stats as statsRepo } from '@backend/local'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
+import { EmptyState, ErrorState, Loading } from '@/components/ScreenState'
 import { colors, fonts } from '@/lib/theme'
 
 export default function Stats() {
   useTheme()
   const insets = useSafeAreaInsets()
-  const { data } = useLocalData(async (l) => ({
+  const { data, loading, error, reload } = useLocalData(async (l) => ({
     perHabit: await statsRepo.getAllStats(l),
     overall: await statsRepo.getOverallCompletion(l),
   }))
@@ -26,6 +27,18 @@ export default function Stats() {
         Your Stats
       </Text>
 
+      {loading && <Loading />}
+      {error && <ErrorState message={error.message} onRetry={reload} />}
+      {data && perHabit.length === 0 && (
+        <EmptyState
+          icon="📊"
+          title="No stats yet"
+          subtitle="Add a habit and check it off to start seeing your progress here."
+        />
+      )}
+
+      {data && perHabit.length > 0 && (
+        <>
       <View style={{ marginHorizontal: 16, backgroundColor: colors.card, borderRadius: 20, padding: 22 }}>
         <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.sub }}>
           OVERALL COMPLETION
@@ -52,15 +65,14 @@ export default function Stats() {
             </View>
           </View>
         ))}
-        {perHabit.length === 0 && (
-          <Text style={{ color: colors.muted, fontSize: 13 }}>No data yet.</Text>
-        )}
       </View>
 
       <View style={{ flexDirection: 'row', gap: 10, marginHorizontal: 16 }}>
         <Stat label="best streak" value={bestStreak} color={colors.accent} />
         <Stat label="total done" value={totalDone} color={colors.green} />
       </View>
+        </>
+      )}
     </ScrollView>
   )
 }

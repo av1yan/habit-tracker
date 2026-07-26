@@ -6,6 +6,7 @@ import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
 import { Ring } from '@/components/Ring'
+import { EmptyState, ErrorState, Loading } from '@/components/ScreenState'
 import { colors, fonts, rgba, streakBadge } from '@/lib/theme'
 
 export default function Today() {
@@ -13,7 +14,7 @@ export default function Today() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const { local, refresh } = useApp()
-  const { data } = useLocalData((l) => logs.getToday(l))
+  const { data, loading, error, reload } = useLocalData((l) => logs.getToday(l))
 
   const greeting = (() => {
     const h = new Date().getHours()
@@ -97,6 +98,15 @@ export default function Today() {
       </Text>
 
       <View style={{ padding: 16, gap: 9 }}>
+        {loading && <Loading />}
+        {error && <ErrorState message={error.message} onRetry={reload} />}
+        {data && data.habits.length === 0 && (
+          <EmptyState
+            icon="🌱"
+            title="No habits yet"
+            subtitle="Tap + to add your first habit and start a streak."
+          />
+        )}
         {(data?.habits ?? []).map(({ habit, done }) => {
           const badge = streakBadge(0)
           return (
@@ -151,12 +161,6 @@ export default function Today() {
             </Pressable>
           )
         })}
-
-        {data && data.habits.length === 0 && (
-          <Text style={{ textAlign: 'center', color: colors.muted, marginTop: 24 }}>
-            No habits yet — tap + to add one.
-          </Text>
-        )}
       </View>
     </ScrollView>
   )

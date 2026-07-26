@@ -8,7 +8,7 @@ import { useApp } from './app-context'
 
 export function useLocalData<T>(
   loader: (local: LocalDB) => Promise<T>,
-): { data: T | null; error: Error | null; reload: () => void } {
+): { data: T | null; error: Error | null; loading: boolean; reload: () => void } {
   const { local, version } = useApp()
   const [data, setData] = useState<T | null>(null)
   const [error, setError] = useState<Error | null>(null)
@@ -27,5 +27,7 @@ export function useLocalData<T>(
 
   useFocusEffect(reload)
 
-  return { data, error, reload }
+  // Loading = nothing loaded yet and no error. Once data arrives (even an empty
+  // list), it stays false, so version-triggered refreshes don't flash a spinner.
+  return { data, error, loading: data === null && error === null, reload }
 }

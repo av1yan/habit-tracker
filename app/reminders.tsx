@@ -7,6 +7,7 @@ import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
 import { rescheduleReminders } from '@/lib/notifications'
+import { Loading } from '@/components/ScreenState'
 import { colors, fonts, rgba } from '@/lib/theme'
 
 const DAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
