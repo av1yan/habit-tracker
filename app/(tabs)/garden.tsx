@@ -113,45 +113,29 @@ function Plant({
       accessibilityLabel={`${name}, ${stage.label}, ${streak} day streak. Open habit.`}
       style={{
         width,
-        borderRadius: 20,
-        padding: 16,
+        borderRadius: 18,
+        paddingVertical: 18,
+        paddingHorizontal: 14,
         alignItems: 'center',
-        backgroundColor: rgba(color, dormant ? 0.06 : 0.13),
-        borderWidth: 1,
-        borderColor: rgba(color, dormant ? 0.08 : 0.18),
-        opacity: dormant ? 0.85 : 1,
+        backgroundColor: rgba(color, dormant ? 0.05 : 0.09),
       }}
     >
-      <View
-        style={{
-          width: 84,
-          height: 84,
-          borderRadius: 999,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: rgba(color, dormant ? 0.08 : 0.16),
-          marginBottom: 10,
-        }}
-      >
-        <Text style={{ fontSize: 44 }}>{stage.emoji}</Text>
-      </View>
+      <Text style={{ fontSize: 52, marginBottom: 10 }}>{stage.emoji}</Text>
 
       <Text numberOfLines={1} style={{ fontSize: 15, fontFamily: fonts.semibold, color: colors.ink, maxWidth: '100%' }}>
         {name}
       </Text>
-      <Text style={{ fontSize: 12, fontFamily: fonts.body, color: colors.sub, marginTop: 3 }}>
+      <Text style={{ fontSize: 12, fontFamily: fonts.body, color: colors.sub, marginTop: 2 }}>
         {dormant ? stage.label : `🔥 ${streak} · ${stage.label}`}
       </Text>
 
       {/* Progress toward the next stage */}
-      <View style={{ width: '100%', marginTop: 12 }}>
-        <View style={{ height: 6, borderRadius: 999, backgroundColor: rgba(color, 0.12), overflow: 'hidden' }}>
-          <View style={{ height: 6, borderRadius: 999, backgroundColor: color, width: `${progress * 100}%` }} />
-        </View>
-        <Text style={{ fontSize: 10, fontFamily: fonts.body, color: colors.muted, marginTop: 5, textAlign: 'center' }}>
-          {next ? `${toNext} day${toNext === 1 ? '' : 's'} to ${next.label}` : 'Fully grown 🎉'}
-        </Text>
+      <View style={{ height: 5, borderRadius: 999, backgroundColor: rgba(color, 0.16), overflow: 'hidden', alignSelf: 'stretch', marginTop: 14 }}>
+        <View style={{ height: 5, borderRadius: 999, backgroundColor: color, width: `${progress * 100}%` }} />
       </View>
+      <Text style={{ fontSize: 10, fontFamily: fonts.body, color: colors.muted, marginTop: 6 }}>
+        {next ? `${toNext} day${toNext === 1 ? '' : 's'} to ${next.label}` : 'Fully grown 🎉'}
+      </Text>
     </Pressable>
   )
 }
