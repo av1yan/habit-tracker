@@ -43,7 +43,7 @@ const levelFor = (n: number, max: number) =>
   n <= 0 ? 0 : Math.min(4, Math.max(1, Math.round((n / Math.max(1, max)) * 4)))
 
 export default function Calendar() {
-  useTheme()
+  const { scheme } = useTheme()
   const insets = useSafeAreaInsets()
   const { local, version } = useApp()
   const router = useRouter()
@@ -127,6 +127,7 @@ export default function Calendar() {
           today={today}
           selected={selected}
           counts={counts}
+          scheme={scheme}
           onPrev={() => setMonthCursor((c) => shiftMonth(c, -1))}
           onNext={() => setMonthCursor((c) => shiftMonth(c, 1))}
           onSelect={setSelected}
@@ -213,6 +214,7 @@ function MonthGrid({
   today,
   selected,
   counts,
+  scheme,
   onPrev,
   onNext,
   onSelect,
@@ -221,6 +223,7 @@ function MonthGrid({
   today: string
   selected: string
   counts: Map<string, number>
+  scheme: 'light' | 'dark'
   onPrev: () => void
   onNext: () => void
   onSelect: (d: string) => void
@@ -301,7 +304,9 @@ function MonthGrid({
                     style={{
                       fontSize: 13,
                       fontFamily: isToday ? fonts.bold : fonts.body,
-                      color: lvl >= 3 && inMonth ? '#fff' : colors.ink,
+                      // High-level cells are the ramp's loud end: dark in light
+                      // mode (needs white text), bright in dark mode (needs dark).
+                      color: inMonth && lvl >= 3 ? (scheme === 'dark' ? '#201e1d' : '#fff') : colors.ink,
                     }}
                   >
                     {Number(date.slice(8, 10))}
