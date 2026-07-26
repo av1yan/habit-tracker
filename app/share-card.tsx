@@ -7,6 +7,7 @@ import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
 import { Loading } from '@/components/ScreenState'
 import { stageFor, THRIVING } from '@/lib/garden'
+import { track } from '@/lib/analytics'
 import { colors, fonts, rgba } from '@/lib/theme'
 
 // The card uses a fixed warm palette (not the live theme) so a shared image
@@ -46,6 +47,7 @@ export default function ShareCard() {
 
   const onShare = async () => {
     setBusy(true)
+    void track('garden_shared')
     // Try to export the card as an image (needs a dev build).
     try {
       const [{ captureRef }, Sharing] = await Promise.all([

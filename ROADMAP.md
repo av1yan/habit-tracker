@@ -87,7 +87,11 @@ architecture.
       are set, so Expo Go is untouched). **Remaining:** set `EXPO_PUBLIC_SENTRY_DSN`,
       `SENTRY_ORG`, `SENTRY_PROJECT`, and the `SENTRY_AUTH_TOKEN` secret in EAS
       (see [`MOBILE.md`](MOBILE.md)).
-- [ ] Basic product analytics
+- [x] Basic product analytics — first-party, privacy-first wrapper
+      (`lib/analytics.ts`) posting coarse non-PII events to PostHog over `fetch`;
+      inert unless `EXPO_PUBLIC_POSTHOG_KEY` is set. Core events instrumented
+      (habit created/completed, streak freeze, garden shared, achievement, app
+      opened). Disclosed in the privacy policy; env documented in `MOBILE.md`.
 - [ ] Server logging/alerting
 
 **Sync hardening**

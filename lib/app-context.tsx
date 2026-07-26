@@ -21,6 +21,7 @@ import type { LocalDB } from '@backend/local'
 import { bootstrapOffline, onSignIn, onSignOut, type OfflineStack } from '@backend/offline'
 import { rescheduleOnForeground, rescheduleReminders } from './notifications'
 import { backfillAchievements } from './achievements'
+import { identifyUser, resetAnalytics, track } from './analytics'
 import { captureError } from './monitoring'
 
 interface AppState {
@@ -58,6 +59,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       lastUser.current = uid
       if (uid) {
         await onSignIn(stack.local, stack.engine, uid)
+        identifyUser(uid)
         // Reschedule local notifications from the freshly-synced reminders.
         rescheduleReminders(stack.local).catch(() => {})
         // Record already-earned milestones silently, so only milestones crossed
@@ -65,6 +67,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         backfillAchievements(stack.local).catch(() => {})
       } else {
         await onSignOut(stack.local, stack.engine)
+        resetAnalytics()
       }
       setVersion((v) => v + 1)
     }
@@ -98,6 +101,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }).data.subscription
 
       setReady(true)
+      void track('app_opened')
     })()
 
     return () => {

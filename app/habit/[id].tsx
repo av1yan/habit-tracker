@@ -6,6 +6,7 @@ import { habits as habitsRepo, logs as logsRepo, stats as statsRepo, freezes as 
 import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
+import { track } from '@/lib/analytics'
 import { EmptyState, Loading } from '@/components/ScreenState'
 import { colors, fonts, rgba } from '@/lib/theme'
 
@@ -59,6 +60,7 @@ export default function HabitDetail() {
     if (!local) return
     try {
       await freezeRepo.useStreakFreeze(local, id)
+      void track('streak_freeze_used', { from: 'habit_detail' })
       refresh()
     } catch (e) {
       Alert.alert('Streak freeze', (e as Error).message)

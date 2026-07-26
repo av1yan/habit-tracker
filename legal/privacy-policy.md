@@ -27,10 +27,13 @@ and their status, any optional notes you attach to a day, reminders you set,
 streaks, achievements, and your streak-freeze balance, plus profile settings
 (display name, avatar emoji, appearance/theme, week start, and timezone).
 
-**Technical and diagnostic data.** Basic device and app information, and — only if
-crash reporting is enabled for a build — crash and error diagnostics. We do **not**
-use advertising identifiers and we do **not** track you across other apps or
-websites.
+**Technical, diagnostic, and usage data.** Basic device and app information; crash
+and error diagnostics (only if crash reporting is enabled for a build); and — if
+product analytics is enabled for a build — coarse, first-party usage events (for
+example, that a habit was created or completed, or the garden card was shared) tied
+to a **pseudonymous identifier**. These events never include your habit names,
+notes, or email. We do **not** use advertising identifiers and we do **not** track
+you across other apps or websites.
 
 We do not knowingly collect precise location, contacts, photos, health-app data, or
 biometric information.
@@ -64,6 +67,7 @@ service, and we do not sell your data.
 - **Supabase** — database, authentication, and backend hosting for your synced data.
 - **Apple** — Sign in with Apple (if you use it) and App Store distribution.
 - **Sentry** — crash and error diagnostics (only when enabled for a build).
+- **PostHog** — first-party product analytics (only when enabled for a build).
 - **Expo (Expo Application Services)** — app build and delivery infrastructure.
 
 We may also disclose information if required by law, or to protect the rights,

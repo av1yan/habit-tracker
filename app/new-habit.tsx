@@ -6,6 +6,7 @@ import { habits as habitsRepo } from '@backend/local'
 import type { HabitFreqType, HabitType } from '@backend/data'
 import { useApp } from '@/lib/app-context'
 import { useTheme } from '@/lib/theme-context'
+import { track } from '@/lib/analytics'
 import { colors, fonts, rgba } from '@/lib/theme'
 
 const ICONS = ['🎯', '🏃', '🧘', '💧', '📚', '💪', '🥗', '☀️', '✍️', '😴', '🧠', '🚴']
@@ -58,6 +59,7 @@ export default function NewHabit() {
       freq_days: freq.freq_days ?? null,
       is_bad: isBad,
     })
+    void track('habit_created', { type, freq_type: freq.freq_type, is_bad: isBad })
     refresh()
     router.back()
   }

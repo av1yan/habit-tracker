@@ -174,3 +174,23 @@ To turn Sentry on for release builds (build on Node 20):
    plugin is skipped and builds still succeed (just no symbolication).
 
 Report errors from anywhere with `captureError(err, context?)`.
+
+## Product analytics
+
+Wired in [`lib/analytics.ts`](lib/analytics.ts) — first-party, privacy-first, and
+**off unless `EXPO_PUBLIC_POSTHOG_KEY` is set**. It posts
+coarse, non-PII events (e.g. `habit_created`, `habit_completed`,
+`streak_freeze_used`, `garden_shared`, `achievement_earned`, `app_opened`) to
+PostHog’s capture endpoint over plain `fetch` — no SDK, no native module, no
+advertising IDs, no cross-app tracking. Events use a pseudonymous id (the auth user
+id once signed in, else a random per-device id).
+
+Enable for a build by setting:
+```bash
+eas env:create --name EXPO_PUBLIC_POSTHOG_KEY  --value "phc_…"
+# optional (defaults to https://us.i.posthog.com):
+eas env:create --name EXPO_PUBLIC_POSTHOG_HOST --value "https://eu.i.posthog.com"
+```
+Without the key, `track()` is a no-op (dev-console only). Track anything with
+`track('event_name', { … })`. Keep properties coarse and PII-free, and keep the
+[Privacy Policy](legal/privacy-policy.md) in sync with what you send.

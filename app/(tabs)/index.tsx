@@ -7,6 +7,7 @@ import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
 import { checkForNewAchievements } from '@/lib/achievements'
 import { useAchievementToast } from '@/lib/achievement-toast'
+import { track } from '@/lib/analytics'
 import { Ring } from '@/components/Ring'
 import { EmptyState, ErrorState, Loading } from '@/components/ScreenState'
 import { colors, fonts, rgba, streakBadge } from '@/lib/theme'
@@ -34,12 +35,18 @@ export default function Today() {
     day: 'numeric',
   })
 
-  const toggle = async (habitId: string) => {
+  const toggle = async (habitId: string, wasDone: boolean) => {
     if (!local) return
     await logs.toggleHabit(local, habitId)
+    if (!wasDone) void track('habit_completed')
     refresh()
     // Celebrate any milestone this completion just crossed (no-op otherwise).
-    checkForNewAchievements(local).then(celebrate).catch(() => {})
+    checkForNewAchievements(local)
+      .then((newly) => {
+        celebrate(newly)
+        newly.forEach((a) => void track('achievement_earned', { kind: a.kind }))
+      })
+      .catch(() => {})
   }
 
   return (
@@ -158,7 +165,7 @@ export default function Today() {
                 </Text>
               </View>
               <Pressable
-                onPress={() => toggle(habit.id)}
+                onPress={() => toggle(habit.id, done)}
                 hitSlop={8}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: done }}
