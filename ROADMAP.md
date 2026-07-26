@@ -84,7 +84,9 @@ architecture.
 
 - [x] Loading / empty / error states across screens (reusable `components/ScreenState.tsx`,
       `loading` flag threaded through `useLocalData`; on Today/Stats/Calendar/habit/Reminders)
-- [ ] Onboarding flow
+- [x] Onboarding flow — one-time 3-slide welcome carousel (`app/onboarding.tsx`)
+      shown on first launch before sign-in, gated by an AsyncStorage flag
+      (`lib/onboarding.ts`); paged swipe + dots, Skip, and Next/Get started
 - Accessibility:
   - [x] Screen readers — roles, labels, and states on all interactive controls;
         decorative grids collapsed to summarized elements
