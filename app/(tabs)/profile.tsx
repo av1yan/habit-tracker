@@ -1,4 +1,4 @@
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native'
+import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
 import { profile as profileRepo } from '@backend/local'
@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme, type ThemePref } from '@/lib/theme-context'
+import { PRIVACY_URL, TERMS_URL } from '@/lib/legal'
 import { colors, fonts } from '@/lib/theme'
 
 export default function Profile() {
@@ -146,6 +147,26 @@ export default function Profile() {
           Delete account
         </Text>
       </Pressable>
+
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, paddingTop: 4 }}>
+        <Pressable
+          onPress={() => Linking.openURL(PRIVACY_URL).catch(() => {})}
+          hitSlop={6}
+          accessibilityRole="link"
+          accessibilityLabel="Privacy Policy"
+        >
+          <Text style={{ color: colors.muted, fontFamily: fonts.body, fontSize: 12 }}>Privacy Policy</Text>
+        </Pressable>
+        <Text style={{ color: colors.muted, fontSize: 12 }}>·</Text>
+        <Pressable
+          onPress={() => Linking.openURL(TERMS_URL).catch(() => {})}
+          hitSlop={6}
+          accessibilityRole="link"
+          accessibilityLabel="Terms of Service"
+        >
+          <Text style={{ color: colors.muted, fontFamily: fonts.body, fontSize: 12 }}>Terms of Service</Text>
+        </Pressable>
+      </View>
     </ScrollView>
   )
 }
