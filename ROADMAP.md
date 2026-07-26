@@ -85,7 +85,11 @@ architecture.
 - [x] Loading / empty / error states across screens (reusable `components/ScreenState.tsx`,
       `loading` flag threaded through `useLocalData`; on Today/Stats/Calendar/habit/Reminders)
 - [ ] Onboarding flow
-- [ ] Accessibility: screen readers, dynamic type, contrast
+- Accessibility:
+  - [x] Screen readers — roles, labels, and states on all interactive controls;
+        decorative grids collapsed to summarized elements
+  - [ ] Dynamic type (respect OS font-size scaling)
+  - [ ] Contrast audit against WCAG AA
 - [ ] Localization / i18n
 - [ ] Reminders robustness: reschedule on device reboot, timezone edge cases
 - [ ] Restore the full 3-step create-habit wizard (currently condensed to one form)
