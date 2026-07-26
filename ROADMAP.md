@@ -50,9 +50,12 @@ architecture.
       URL Configuration; test the email→link→app flow on a real device.
 - [x] Account deletion (`delete_account()` RPC — cascades all user data; verified;
       wired to Profile → "Delete account")
-- [ ] **Sign in with Apple** — *not required* while email/password is the only
-      login. Needs `expo-apple-authentication` + a dev/prod build (not Expo Go),
-      an Apple Developer account, and the Supabase Apple provider configured.
+- [x] **Sign in with Apple** — wired on the sign-in screen (`expo-apple-authentication`
+      → `supabase.auth.signInWithIdToken`), iOS-only, shown when available. Entitlement
+      enabled in `app.json` (`ios.usesAppleSignIn` + plugin). **Remaining to go live:**
+      run it on a dev/prod build (not Expo Go) and enable the Supabase Apple provider
+      (Dashboard → Authentication → Providers → Apple) with bundle id
+      `com.av1yan.habittracker` in the authorized client IDs.
 - [ ] Verify email confirmation is enabled (Supabase default: on)
 - [ ] Enable leaked-password protection (Supabase Auth → Passwords — dashboard toggle)
 

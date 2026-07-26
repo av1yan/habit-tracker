@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native'
+import * as AppleAuthentication from 'expo-apple-authentication'
 import { Link, Redirect } from 'expo-router'
 import { isConfigured, supabase } from '@/lib/supabase'
 import { useApp } from '@/lib/app-context'
@@ -26,15 +27,51 @@ const inputStyle = () =>
   }) as const
 
 export default function SignIn() {
-  useTheme()
+  const { scheme } = useTheme()
   const { session } = useApp()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [appleAvailable, setAppleAvailable] = useState(false)
+
+  // Sign in with Apple is iOS-only and needs the native module (a dev/prod
+  // build, not Expo Go). Show the button only where it can actually work.
+  useEffect(() => {
+    let alive = true
+    AppleAuthentication.isAvailableAsync()
+      .then((ok) => alive && setAppleAvailable(ok))
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [])
 
   if (session) return <Redirect href="/(tabs)" />
+
+  const signInWithApple = async () => {
+    setError(null)
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      })
+      if (!credential.identityToken) throw new Error('No identity token returned by Apple.')
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: credential.identityToken,
+      })
+      if (error) setError(error.message)
+      // On success, AppProvider's auth listener flips `session` and we redirect.
+    } catch (e) {
+      // The user tapping Cancel isn't an error worth surfacing.
+      if ((e as { code?: string }).code === 'ERR_REQUEST_CANCELED') return
+      setError((e as Error).message ?? 'Apple sign-in failed.')
+    }
+  }
 
   const submit = async () => {
     setBusy(true)
@@ -113,6 +150,27 @@ export default function SignIn() {
             </Text>
           )}
         </Pressable>
+
+        {appleAvailable && (
+          <>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 2 }}>
+              <View style={{ flex: 1, height: 1, backgroundColor: colors.line }} />
+              <Text style={{ color: colors.muted, fontSize: 12, fontFamily: fonts.body }}>or</Text>
+              <View style={{ flex: 1, height: 1, backgroundColor: colors.line }} />
+            </View>
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+              buttonStyle={
+                scheme === 'dark'
+                  ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                  : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+              }
+              cornerRadius={999}
+              style={{ height: 50, width: '100%' }}
+              onPress={signInWithApple}
+            />
+          </>
+        )}
 
         <Pressable
           onPress={() => setMode(mode === 'signin' ? 'signup' : 'signin')}

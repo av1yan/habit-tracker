@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.av1yan.habittracker"
+      "bundleIdentifier": "com.av1yan.habittracker",
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "com.av1yan.habittracker",
@@ -24,7 +25,7 @@
         "backgroundColor": "#c67139"
       }
     },
-    "plugins": ["expo-router"],
+    "plugins": ["expo-router", "expo-apple-authentication"],
     "experiments": {
       "typedRoutes": true
     }
