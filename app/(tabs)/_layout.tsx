@@ -28,6 +28,10 @@ export default function TabsLayout() {
         options={{ title: 'Today', tabBarIcon: ({ color }) => <Icon emoji="◧" color={color} /> }}
       />
       <Tabs.Screen
+        name="garden"
+        options={{ title: 'Garden', tabBarIcon: ({ color }) => <Icon emoji="❀" color={color} /> }}
+      />
+      <Tabs.Screen
         name="calendar"
         options={{ title: 'Calendar', tabBarIcon: ({ color }) => <Icon emoji="▦" color={color} /> }}
       />
