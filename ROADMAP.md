@@ -56,9 +56,10 @@ architecture.
 ## Phase 2 — Should-fix before real users
 
 **Testing & CI**
-- [ ] Tests for the DAL and local repos
+- [x] Tests for the DAL (mock Supabase client) and local repos (real node:sqlite) —
+      ~29 new tests, 44 total via `npm test`
+- [x] CI pipeline — GitHub Actions runs backend + app typecheck and all tests on push/PR
 - [ ] E2E smoke tests (Maestro or Detox) for core flows
-- [ ] CI pipeline (typecheck + test on PR)
 
 **Observability**
 - [ ] Crash/error reporting (Sentry) + app error boundaries

@@ -13,5 +13,5 @@
     "types": []
   },
   "include": ["src", "types"],
-  "exclude": ["node_modules", "src/**/*.test.ts", "src/sync/testing"]
+  "exclude": ["node_modules", "src/**/*.test.ts", "src/**/testing"]
 }

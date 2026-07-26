@@ -17,5 +17,5 @@
     "expo-env.d.ts",
     ".expo/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "src/sync/testing", "**/*.test.ts", "supabase"]
+  "exclude": ["node_modules", "src/**/testing", "**/*.test.ts", "supabase"]
 }

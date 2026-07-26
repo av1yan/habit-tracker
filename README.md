@@ -1,5 +1,7 @@
 # Habit Tracker
 
+[![CI](https://github.com/av1yan/habit-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/av1yan/habit-tracker/actions/workflows/ci.yml)
+
 An offline-first habit tracker for iOS and Android, built with Expo (React Native)
 and a Supabase (Postgres) backend. Track daily habits, keep streaks, freeze a
 streak when life happens, get local reminders, and see your progress on a
