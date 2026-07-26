@@ -8,9 +8,15 @@ heatmap and stats screen — all working offline and syncing across devices.
 Built end-to-end from an MVP design prototype: schema → migrations → typed
 data layer → offline sync engine → mobile app.
 
+## Screenshots
+
 <p align="center">
-  <img src="docs/today.png" alt="Today screen — dark mode, showing the completion ring and habit list" width="300" />
+  <img src="docs/today-dark.png" alt="Today screen in dark mode" width="280" />
+  &nbsp;&nbsp;
+  <img src="docs/today-light.png" alt="Today screen in light mode" width="280" />
 </p>
+
+<p align="center"><em>Today screen — dark and light themes</em></p>
 
 ## Features
 
