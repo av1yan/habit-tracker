@@ -109,6 +109,26 @@ eas init          # links the project and writes extra.eas.projectId into app.js
 - `preview` — internal-distribution release build (TestFlight / ad-hoc)
 - `production` — store build (auto-increments build number)
 
+### Development build (simulator — no Apple account needed)
+
+A dev build compiles the native modules that Expo Go doesn't bundle
+(`react-native-view-shot` for the shareable-card image export, etc.). The
+`development` profile builds for the **iOS simulator** (`ios.simulator: true`),
+so it needs only a free Expo account — no Apple Developer membership.
+
+```bash
+eas login                                              # your Expo account
+eas init                                               # once, links the project
+eas build --profile development --platform ios         # cloud build (~10–20 min)
+eas build:run -p ios                                   # install the .app to a booted simulator
+npx expo start --dev-client                            # then open the dev-client app
+```
+
+`expo-dev-client` is already a dependency. The dev-client app replaces Expo Go —
+open it (not Expo Go) and it connects to the Metro server from
+`expo start --dev-client`. To build locally instead of on EAS (needs Xcode +
+CocoaPods), `npx expo run:ios` does a prebuild + local compile.
+
 **Commands** (also wired as npm scripts)
 ```bash
 npm run build:preview            # internal test build (iOS + Android)
