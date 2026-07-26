@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Habit Tracker",
+    "slug": "habit-tracker",
+    "scheme": "habittracker",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "splash": {
+      "backgroundColor": "#f5ead8"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.habittracker"
+    },
+    "android": {
+      "package": "com.example.habittracker"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

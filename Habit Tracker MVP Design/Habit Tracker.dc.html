@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+  <link rel="stylesheet" href="_ds/organic-e4fccf5f-be1d-4282-af21-a84f03ceddc4/styles.css">
+  <script src="_ds/organic-e4fccf5f-be1d-4282-af21-a84f03ceddc4/_ds_bundle.js"></script>
+  <style>
+    @keyframes popCheck { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+    body { display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:40px 20px; background:#f0eee9; }
+    a { color:#c67139; } a:hover { color:#b2622d; }
+    textarea::-webkit-scrollbar { display:none; }
+  </style>
+</helmet>
+
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" title="Habits" hint-size="393px,852px">
+  <div style="display:flex; flex-direction:column; height:100%; background:#f5ead8; font-family:Figtree,system-ui,sans-serif; overflow:hidden;">
+
+    <!-- TODAY SCREEN -->
+    <div style="{{ homeStyle }}">
+      <div style="padding:20px 20px 12px; display:flex; align-items:flex-start; justify-content:space-between; flex-shrink:0;">
+        <div>
+          <div style="font-family:Caprasimo,serif; font-size:26px; line-height:1.1; color:#201e1d;">{{ greeting }}</div>
+          <div style="font-size:13px; color:#a09786; margin-top:3px;">{{ dateStr }}</div>
+        </div>
+        <div style="width:40px; height:40px; border-radius:999px; background:#ebddc5; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;" onClick="{{ onOpenCreate }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c67139" stroke-width="2.75" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        </div>
+      </div>
+
+      <div style="margin:0 16px 14px; background:#ebddc5; border-radius:20px; padding:18px 20px; display:flex; align-items:center; gap:20px; flex-shrink:0;">
+        <svg width="88" height="88" viewBox="0 0 88 88" style="flex-shrink:0;">
+          <circle cx="44" cy="44" r="{{ R }}" fill="none" stroke="#dcd3c4" stroke-width="7"></circle>
+          <circle cx="44" cy="44" r="{{ R }}" fill="none" stroke="#c67139" stroke-width="7"
+            stroke-dasharray="{{ dash }} {{ gap }}" stroke-linecap="round" transform="rotate(-90 44 44)"></circle>
+          <text x="44" y="40" text-anchor="middle" font-size="15" font-family="Caprasimo,serif" fill="#201e1d">{{ pct }}%</text>
+          <text x="44" y="54" text-anchor="middle" font-size="9" font-family="Figtree,sans-serif" fill="#a09786">done</text>
+        </svg>
+        <div>
+          <div style="font-family:Caprasimo,serif; font-size:30px; line-height:1; color:#201e1d;">{{ completedCount }}<span style="font-size:18px; color:#a09786;">/{{ totalCount }}</span></div>
+          <div style="font-size:13px; color:#82796a; margin-top:5px;">habits today</div>
+          <div style="margin-top:10px; background:#c6713918; color:#c67139; font-size:12px; font-weight:700; border-radius:999px; padding:4px 12px; display:inline-block;">🔥 Keep going!</div>
+        </div>
+      </div>
+
+      <div style="padding:0 16px; overflow-y:auto; flex:1; padding-bottom:16px;">
+        <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:12px; padding:0 2px;">Today's habits</div>
+        <sc-for list="{{ habitsWithState }}" as="habit" hint-placeholder-count="5">
+          <div style="display:flex; align-items:center; gap:12px; background:#fff; border-radius:16px; padding:13px 14px; margin-bottom:9px; cursor:pointer; box-shadow:0 1px 4px rgba(46,43,37,0.07);" onClick="{{ habit.onTap }}">
+            <div style="{{ habit.iconContainerStyle }}">{{ habit.icon }}</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:15px; font-weight:600; color:#201e1d; display:flex; align-items:center; gap:6px;">
+                {{ habit.name }}
+                <span style="{{ habit.badgeStyle }}">{{ habit.badge }}</span>
+              </div>
+              <div style="font-size:12px; color:#a09786; margin-top:2px;">🔥 {{ habit.streak }}d · {{ habit.category }}</div>
+            </div>
+            <div style="{{ habit.checkStyle }}" onClick="{{ habit.onToggle }}">
+              <svg width="15" height="15" viewBox="0 0 16 16" style="{{ habit.checkIconStyle }}">
+                <path d="M3 8l3.5 3.5L13 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+              </svg>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- DETAIL SCREEN -->
+    <div style="{{ detailStyle }}">
+      <div style="padding:16px 20px 12px; display:flex; align-items:center; gap:12px; flex-shrink:0; border-bottom:1px solid #ebddc5;">
+        <div style="cursor:pointer; color:#c67139; font-weight:700; font-size:14px; display:flex; align-items:center; gap:4px;" onClick="{{ onBack }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round"><path d="M15 18l-6-6 6-6"></path></svg>
+          Back
+        </div>
+        <div style="font-family:Caprasimo,serif; font-size:18px; color:#201e1d; flex:1;">{{ activeHabitName }}</div>
+      </div>
+
+      <div style="overflow-y:auto; flex:1; padding-bottom:20px;">
+        <div style="margin:16px 16px 12px; background:#ebddc5; border-radius:20px; padding:22px 20px; display:flex; align-items:center; gap:20px;">
+          <div style="{{ activeHabitIconStyle }}">{{ activeHabitIcon }}</div>
+          <div>
+            <div style="font-family:Caprasimo,serif; font-size:48px; line-height:1; color:#c67139;">{{ activeHabitStreak }}</div>
+            <div style="font-size:13px; color:#82796a; margin-top:4px;">day streak 🔥</div>
+            <div style="font-size:12px; color:#a09786; margin-top:3px;">Best ever: {{ activeHabitLongest }} days</div>
+          </div>
+        </div>
+
+        <div style="margin:0 16px 12px; background:#fff; border-radius:16px; padding:16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:14px;">This week</div>
+          <div style="display:flex; gap:4px; justify-content:space-between;">
+            <sc-for list="{{ weekDays }}" as="day" hint-placeholder-count="7">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <div style="font-size:11px; color:#a09786;">{{ day.label }}</div>
+                <div style="{{ day.dotStyle }}">
+                  <svg width="10" height="10" viewBox="0 0 16 16" style="{{ day.checkIconStyle }}">
+                    <path d="M3 8l3.5 3.5L13 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+                  </svg>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin:0 16px 12px; display:flex; gap:10px;">
+          <div style="flex:1; background:#fff; border-radius:16px; padding:16px; text-align:center;">
+            <div style="font-family:Caprasimo,serif; font-size:34px; line-height:1; color:#c67139;">{{ activeHabitTotal }}</div>
+            <div style="font-size:11px; color:#a09786; margin-top:5px;">completions</div>
+          </div>
+          <div style="flex:1; background:#fff; border-radius:16px; padding:16px; text-align:center;">
+            <div style="font-family:Caprasimo,serif; font-size:34px; line-height:1; color:#7a8a5e;">{{ activeHabitRate }}%</div>
+            <div style="font-size:11px; color:#a09786; margin-top:5px;">completion rate</div>
+          </div>
+        </div>
+
+        <div style="margin:0 16px 12px; background:#fff; border-radius:16px; padding:16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:10px;">Today's note</div>
+          <textarea placeholder="How did it go? Add a note…" style="width:100%; border:none; background:transparent; font-family:Figtree,sans-serif; font-size:14px; color:#201e1d; resize:none; outline:none; height:64px; line-height:1.55; padding:0; display:block;"></textarea>
+        </div>
+
+        <div style="margin:0 16px; background:#c6713910; border-radius:16px; padding:16px; display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div style="font-size:14px; font-weight:600; color:#201e1d;">🧊 Streak Freeze</div>
+            <div style="font-size:12px; color:#82796a; margin-top:2px;">2 available — protect your streak</div>
+          </div>
+          <div style="background:#c67139; color:#fff; font-size:12px; font-weight:700; border-radius:999px; padding:6px 14px; cursor:pointer; flex-shrink:0;">Use one</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE SCREEN -->
+    <div style="{{ createStyle }}">
+      <div style="padding:16px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #ebddc5; flex-shrink:0;">
+        <div style="cursor:pointer; color:#c67139; font-size:14px; font-weight:700;" onClick="{{ onBack }}">Cancel</div>
+        <div style="font-family:Caprasimo,serif; font-size:17px; color:#201e1d;">New Habit</div>
+        <div style="font-size:12px; color:#a09786; width:40px; text-align:right;">{{ createStep }}/3</div>
+      </div>
+      <div style="height:3px; background:#ebddc5; flex-shrink:0;">
+        <div style="{{ createProgressStyle }}"></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div style="{{ step1Style }}">
+        <div style="font-family:Caprasimo,serif; font-size:22px; line-height:1.2; color:#201e1d;">What habit do you<br>want to build?</div>
+        <input type="text" value="{{ newHabit.name }}" placeholder="e.g. Morning Run" onChange="{{ onSetNewHabitName }}"
+          style="font-size:16px; font-weight:600; border:none; background:#ebddc5; border-radius:14px; padding:14px 16px; color:#201e1d; outline:none; width:100%; font-family:Figtree,sans-serif; box-sizing:border-box;" />
+        <div>
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:10px;">Icon</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <sc-for list="{{ iconOptions }}" as="opt" hint-placeholder-count="15">
+              <div style="{{ opt.style }}" onClick="{{ opt.onClick }}">{{ opt.icon }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:10px;">Color</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <sc-for list="{{ colorOptions }}" as="col" hint-placeholder-count="6">
+              <div style="{{ col.style }}" onClick="{{ col.onClick }}"></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="margin-top:auto; padding-top:8px;">
+          <div style="background:#c67139; border-radius:999px; padding:15px; text-align:center; font-weight:700; font-size:15px; color:#fff; cursor:pointer;" onClick="{{ onNextStep }}">Continue →</div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="{{ step2Style }}">
+        <div style="font-family:Caprasimo,serif; font-size:22px; line-height:1.2; color:#201e1d;">How often will<br>you do it?</div>
+        <div>
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:10px;">Frequency</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ freqOptions }}" as="opt" hint-placeholder-count="4">
+              <div style="{{ opt.style }}" onClick="{{ opt.onClick }}">{{ opt.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:10px;">Habit type</div>
+          <div style="display:flex; gap:8px;">
+            <sc-for list="{{ typeOptions }}" as="opt" hint-placeholder-count="3">
+              <div style="{{ opt.style }}" onClick="{{ opt.onClick }}">{{ opt.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:10px;">Category</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <sc-for list="{{ catOptions }}" as="opt" hint-placeholder-count="6">
+              <div style="{{ opt.style }}" onClick="{{ opt.onClick }}">{{ opt.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:auto; padding-top:8px;">
+          <div style="flex:1; border:2px solid #c67139; border-radius:999px; padding:14px; text-align:center; font-weight:700; font-size:14px; color:#c67139; cursor:pointer;" onClick="{{ onPrevStep }}">← Back</div>
+          <div style="flex:2; background:#c67139; border-radius:999px; padding:14px; text-align:center; font-weight:700; font-size:14px; color:#fff; cursor:pointer;" onClick="{{ onNextStep }}">Continue →</div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="{{ step3Style }}">
+        <div style="font-family:Caprasimo,serif; font-size:22px; line-height:1.2; color:#201e1d;">Looking good! 🎉</div>
+        <div style="background:#fff; border-radius:20px; padding:20px; display:flex; align-items:center; gap:16px; box-shadow:0 3px 10px rgba(46,43,37,0.1);">
+          <div style="{{ previewIconStyle }}">{{ newHabit.icon }}</div>
+          <div>
+            <div style="font-size:17px; font-weight:700; color:#201e1d; line-height:1.2;">{{ newHabitName }}</div>
+            <div style="font-size:12px; color:#a09786; margin-top:4px;">{{ newHabit.category }} · {{ newHabit.freq }}</div>
+            <div style="margin-top:8px; display:inline-block; font-size:11px; font-weight:700; border-radius:999px; padding:3px 10px; background:#c6713920; color:#c67139;">{{ newHabitTypeLabel }}</div>
+          </div>
+        </div>
+        <div style="background:#fff; border-radius:16px; padding:16px;">
+          <div style="font-size:14px; font-weight:600; color:#201e1d; margin-bottom:12px;">This habit is something I want to…</div>
+          <div style="display:flex; gap:8px;">
+            <div style="{{ buildStyle }}" onClick="{{ onSetBuild }}">✅ Build</div>
+            <div style="{{ quitStyle }}" onClick="{{ onSetQuit }}">🚫 Quit</div>
+          </div>
+        </div>
+        <div style="margin-top:auto; padding-top:8px; display:flex; flex-direction:column; gap:10px;">
+          <div style="background:#c67139; border-radius:999px; padding:15px; text-align:center; font-weight:700; font-size:15px; color:#fff; cursor:pointer;" onClick="{{ onSaveHabit }}">Add Habit</div>
+          <div style="text-align:center; cursor:pointer; color:#a09786; font-size:13px;" onClick="{{ onPrevStep }}">← Go back</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS SCREEN -->
+    <div style="{{ statsStyle }}">
+      <div style="padding:20px 20px 12px; flex-shrink:0;">
+        <div style="font-family:Caprasimo,serif; font-size:26px; color:#201e1d;">Your Stats</div>
+        <div style="font-size:13px; color:#a09786; margin-top:3px;">Last 90 days</div>
+      </div>
+      <div style="padding:0 16px; overflow-y:auto; flex:1; padding-bottom:20px; display:flex; flex-direction:column; gap:12px;">
+        <div style="background:#ebddc5; border-radius:20px; padding:22px 20px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#82796a; margin-bottom:8px;">Overall completion</div>
+          <div style="font-family:Caprasimo,serif; font-size:52px; line-height:1; color:#c67139;">74%</div>
+          <div style="font-size:12px; color:#82796a; margin-top:6px;">↑ 6% vs. last month</div>
+        </div>
+        <div style="background:#fff; border-radius:16px; padding:16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:14px;">Per habit</div>
+          <sc-for list="{{ habitsWithState }}" as="habit" hint-placeholder-count="5">
+            <div style="margin-bottom:14px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <div style="font-size:13px; font-weight:600; color:#201e1d;">{{ habit.icon }} {{ habit.name }}</div>
+                <div style="font-size:12px; color:#a09786;">{{ habit.streak }}d</div>
+              </div>
+              <div style="height:6px; background:#ebddc5; border-radius:999px; overflow:hidden;">
+                <div style="{{ habit.barStyle }}"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1; background:#fff; border-radius:16px; padding:16px; text-align:center;">
+            <div style="font-family:Caprasimo,serif; font-size:34px; line-height:1; color:#c67139;">21</div>
+            <div style="font-size:11px; color:#a09786; margin-top:5px;">best streak</div>
+          </div>
+          <div style="flex:1; background:#fff; border-radius:16px; padding:16px; text-align:center;">
+            <div style="font-family:Caprasimo,serif; font-size:34px; line-height:1; color:#7a8a5e;">334</div>
+            <div style="font-size:11px; color:#a09786; margin-top:5px;">total done</div>
+          </div>
+        </div>
+        <div style="background:#fff; border-radius:16px; padding:16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:12px;">Milestones</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="font-size:22px;">⭐</div>
+              <div style="flex:1;"><div style="font-size:13px; font-weight:600; color:#201e1d;">7-day streak</div><div style="font-size:12px; color:#7a8a5e;">Achieved ✓</div></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="font-size:22px;">🏆</div>
+              <div style="flex:1;"><div style="font-size:13px; font-weight:600; color:#201e1d;">30-day streak</div><div style="font-size:12px; color:#7a8a5e;">Achieved ✓</div></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="font-size:22px;">💎</div>
+              <div style="flex:1;"><div style="font-size:13px; font-weight:600; color:#201e1d;">100-day streak</div><div style="font-size:12px; color:#a09786;">79 days to go →</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDAR SCREEN -->
+    <div style="{{ calStyle }}">
+      <div style="padding:20px 20px 12px; flex-shrink:0;">
+        <div style="font-family:Caprasimo,serif; font-size:26px; color:#201e1d;">Calendar</div>
+        <div style="font-size:13px; color:#a09786; margin-top:3px;">Completion heatmap</div>
+      </div>
+      <div style="padding:0 16px; overflow-y:auto; flex:1; padding-bottom:20px; display:flex; flex-direction:column; gap:12px;">
+        <div style="background:#fff; border-radius:16px; padding:16px; overflow:hidden;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:12px;">Last 15 weeks</div>
+          {{ heatmapEl }}
+          <div style="display:flex; gap:5px; align-items:center; margin-top:12px; justify-content:flex-end;">
+            <span style="font-size:10px; color:#a09786;">Less</span>
+            <div style="width:11px; height:11px; border-radius:3px; background:#ebddc5;"></div>
+            <div style="width:11px; height:11px; border-radius:3px; background:#ffc6a5;"></div>
+            <div style="width:11px; height:11px; border-radius:3px; background:#f6a06b;"></div>
+            <div style="width:11px; height:11px; border-radius:3px; background:#d67f48;"></div>
+            <div style="width:11px; height:11px; border-radius:3px; background:#b2622d;"></div>
+            <span style="font-size:10px; color:#a09786;">More</span>
+          </div>
+        </div>
+        <div style="background:#ebddc5; border-radius:16px; padding:16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#82796a; margin-bottom:12px;">{{ currentMonthName }}</div>
+          <div style="display:flex; gap:0px; margin-bottom:6px;">
+            <div style="flex:1; font-size:9px; color:#a09786; text-align:center;">S</div>
+            <div style="flex:1; font-size:9px; color:#a09786; text-align:center;">M</div>
+            <div style="flex:1; font-size:9px; color:#a09786; text-align:center;">T</div>
+            <div style="flex:1; font-size:9px; color:#a09786; text-align:center;">W</div>
+            <div style="flex:1; font-size:9px; color:#a09786; text-align:center;">T</div>
+            <div style="flex:1; font-size:9px; color:#a09786; text-align:center;">F</div>
+            <div style="flex:1; font-size:9px; color:#a09786; text-align:center;">S</div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; justify-items:center;">
+            {{ monthCalEl }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE SCREEN -->
+    <div style="{{ profileStyle }}">
+      <div style="padding:20px 20px 12px; flex-shrink:0;">
+        <div style="font-family:Caprasimo,serif; font-size:26px; color:#201e1d;">Profile</div>
+      </div>
+      <div style="padding:0 16px; overflow-y:auto; flex:1; padding-bottom:20px; display:flex; flex-direction:column; gap:12px;">
+        <div style="background:#ebddc5; border-radius:20px; padding:24px 20px; display:flex; align-items:center; gap:16px;">
+          <div style="width:64px; height:64px; border-radius:999px; background:#dcd3c4; display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0;">🙂</div>
+          <div>
+            <div style="font-family:Caprasimo,serif; font-size:20px; color:#201e1d;">Your Habits</div>
+            <div style="font-size:13px; color:#82796a; margin-top:3px;">Member since July 2025</div>
+          </div>
+        </div>
+        <div style="background:#fff; border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:center; gap:14px; cursor:pointer;">
+            <div style="width:40px; height:40px; border-radius:12px; background:#c6713918; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🧊</div>
+            <div style="flex:1;"><div style="font-size:14px; font-weight:600; color:#201e1d;">Streak Freeze</div><div style="font-size:12px; color:#82796a;">2 freezes available</div></div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0b6a5" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"></path></svg>
+          </div>
+          <div style="height:1px; background:#f5ead8;"></div>
+          <div style="display:flex; align-items:center; gap:14px; cursor:pointer;">
+            <div style="width:40px; height:40px; border-radius:12px; background:#7a8a5e18; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🔔</div>
+            <div style="flex:1;"><div style="font-size:14px; font-weight:600; color:#201e1d;">Reminders</div><div style="font-size:12px; color:#82796a;">Per-habit, custom times</div></div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0b6a5" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"></path></svg>
+          </div>
+          <div style="height:1px; background:#f5ead8;"></div>
+          <div style="display:flex; align-items:center; gap:14px; cursor:pointer;">
+            <div style="width:40px; height:40px; border-radius:12px; background:#4a90d918; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🌙</div>
+            <div style="flex:1;"><div style="font-size:14px; font-weight:600; color:#201e1d;">Dark Mode</div><div style="font-size:12px; color:#82796a;">Use system setting</div></div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0b6a5" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"></path></svg>
+          </div>
+          <div style="height:1px; background:#f5ead8;"></div>
+          <div style="display:flex; align-items:center; gap:14px; cursor:pointer;">
+            <div style="width:40px; height:40px; border-radius:12px; background:#82796a18; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">📤</div>
+            <div style="flex:1;"><div style="font-size:14px; font-weight:600; color:#201e1d;">Export Data</div><div style="font-size:12px; color:#82796a;">CSV or PDF</div></div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0b6a5" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"></path></svg>
+          </div>
+        </div>
+        <div style="background:#fff; border-radius:16px; padding:16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#a09786; margin-bottom:12px;">Account</div>
+          <div style="background:#ebddc5; border-radius:12px; padding:13px 16px; text-align:center; font-weight:600; font-size:14px; color:#201e1d; cursor:pointer;">Sign in / Create account</div>
+          <div style="font-size:11px; color:#a09786; text-align:center; margin-top:8px;">Cloud sync across devices</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div style="{{ tabBarStyle }}">
+      <div style="{{ tabTodayItemStyle }}" onClick="{{ onTabToday }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="M3 9h18M9 21V9"></path></svg>
+        <span style="font-size:10px; font-weight:600;">Today</span>
+      </div>
+      <div style="{{ tabCalItemStyle }}" onClick="{{ onTabCal }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+        <span style="font-size:10px; font-weight:600;">Calendar</span>
+      </div>
+      <div style="{{ tabStatsItemStyle }}" onClick="{{ onTabStats }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"></path></svg>
+        <span style="font-size:10px; font-weight:600;">Stats</span>
+      </div>
+      <div style="{{ tabProfileItemStyle }}" onClick="{{ onTabProfile }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"></path></svg>
+        <span style="font-size:10px; font-weight:600;">Profile</span>
+      </div>
+    </div>
+
+  </div>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    screen: 'home',
+    tab: 'today',
+    habits: [
+      { id:1, name:'Morning Run', icon:'🏃', color:'#c67139', category:'Fitness', streak:12, longest:24, type:'binary', freq:'Daily', totalDone:89 },
+      { id:2, name:'Meditate', icon:'🧘', color:'#7a8a5e', category:'Wellness', streak:7, longest:30, type:'duration', target:20, unit:'min', freq:'Daily', totalDone:67 },
+      { id:3, name:'Drink Water', icon:'💧', color:'#4a90d9', category:'Health', streak:3, longest:14, type:'quantity', target:8, unit:'glasses', freq:'Daily', totalDone:45 },
+      { id:4, name:'Read', icon:'📚', color:'#8a6a4a', category:'Growth', streak:21, longest:45, type:'duration', target:30, unit:'min', freq:'Daily', totalDone:102 },
+      { id:5, name:'No Social Media', icon:'📵', color:'#c0504a', category:'Wellness', streak:5, longest:12, type:'binary', freq:'Daily', totalDone:31, bad:true },
+    ],
+    completed: new Set([3]),
+    celebrating: null,
+    activeHabit: null,
+    createStep: 1,
+    newHabit: { name:'', icon:'🎯', color:'#c67139', category:'Health', freq:'Daily', type:'binary', bad:false },
+  };
+
+  _rgba(hex, a) {
+    if (!hex || hex.length < 7) return `rgba(198,113,57,${a})`;
+    const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  toggleHabit(id) {
+    const c = new Set(this.state.completed);
+    if (c.has(id)) { c.delete(id); this.setState({completed:c}); }
+    else { c.add(id); this.setState({completed:c, celebrating:id}); setTimeout(()=>this.setState({celebrating:null}),900); }
+  }
+
+  renderVals() {
+    const {screen, tab, habits, completed, celebrating, activeHabit, createStep, newHabit} = this.state;
+    const now = new Date();
+    const hr = now.getHours();
+    const greeting = hr<12 ? 'Good morning' : hr<17 ? 'Good afternoon' : 'Good evening';
+    const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const dateStr = `${dayNames[now.getDay()]}, ${monthNames[now.getMonth()]} ${now.getDate()}`;
+    const completedCount = completed.size;
+    const totalCount = habits.length;
+    const pct = totalCount ? Math.round(completedCount/totalCount*100) : 0;
+    const R = 38, circ = 2*Math.PI*R;
+    const dash = circ*pct/100, gap = circ-dash;
+    const rgba = this._rgba.bind(this);
+
+    const habitsWithState = habits.map(h => {
+      const done = completed.has(h.id);
+      const sc = h.color && h.color.length===7 ? h.color : '#c67139';
+      const rate = Math.min(100, Math.round(h.totalDone/90*100));
+      const isCelebrating = celebrating === h.id;
+      const badge = h.streak >= 100 ? '💎' : h.streak >= 30 ? '🏆' : h.streak >= 7 ? '⭐' : '';
+      return {
+        ...h, done,
+        badge,
+        badgeStyle: { fontSize:12, display: badge ? 'inline' : 'none' },
+        iconContainerStyle: { width:46, height:46, borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, background:rgba(sc,0.15), flexShrink:0 },
+        checkStyle: done
+          ? { width:34, height:34, borderRadius:'999px', background: isCelebrating ? sc : sc, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, animation: isCelebrating ? 'popCheck 0.35s ease' : 'none' }
+          : { width:34, height:34, borderRadius:'999px', border:'2.5px solid #d0c8be', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0 },
+        checkIconStyle: { opacity: done ? 1 : 0 },
+        barStyle: { height:'6px', borderRadius:'999px', background:sc, width:`${rate}%`, transition:'width 0.4s ease' },
+        onToggle: (e) => { if(e) e.stopPropagation(); this.toggleHabit(h.id); },
+        onTap: () => this.setState({ activeHabit:h, screen:'detail' }),
+      };
+    });
+
+    const ah = activeHabit || {};
+    const ahColor = ah.color && ah.color.length===7 ? ah.color : '#c67139';
+    const shortDays = ['S','M','T','W','T','F','S'];
+    const weekDays = shortDays.map((label, i) => {
+      const done = i < now.getDay() && ((ah.id||1)*3 + i) % 4 !== 0;
+      const isToday = i === now.getDay();
+      return {
+        label,
+        dotStyle: { width:28, height:28, borderRadius:'999px', background: isToday ? ahColor : done ? rgba(ahColor,0.25) : 'transparent', border: !isToday && !done ? '2px solid #ebddc5' : 'none', display:'flex', alignItems:'center', justifyContent:'center' },
+        checkIconStyle: { opacity: isToday || done ? 1 : 0, display:'block' },
+      };
+    });
+
+    const hColors = ['#ebddc5','#ffc6a5','#f6a06b','#d67f48','#b2622d'];
+    const heatmapEl = React.createElement('div', { style:{display:'flex',gap:3} },
+      ...Array.from({length:15}, (_,w) =>
+        React.createElement('div', {key:w, style:{display:'flex',flexDirection:'column',gap:3}},
+          ...Array.from({length:7}, (_,d) => {
+            const n = (w*17 + d*7 + 3) % 10;
+            const lv = n<2?0:n<4?1:n<6?2:n<8?3:4;
+            return React.createElement('div', {key:d, style:{width:13,height:13,borderRadius:3,background:hColors[lv]}});
+          })
+        )
+      )
+    );
+
+    const firstDow = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+    const dim = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    const monthCalEl = React.createElement(React.Fragment, null,
+      ...Array.from({length:firstDow}, (_,i) => React.createElement('div', {key:`e${i}`})),
+      ...Array.from({length:dim}, (_,i) => {
+        const d=i+1, isT=d===now.getDate(), isDone=d<now.getDate()&&(d*3+7)%5!==0;
+        return React.createElement('div', {key:d, style:{
+          width:28, height:28, borderRadius:'999px',
+          background: isT?'#c67139':isDone?rgba('#c67139',0.2):'transparent',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:11, color:isT?'#fff':'#201e1d', fontWeight:isT?600:400,
+        }}, d);
+      })
+    );
+
+    const nhColor = newHabit.color && newHabit.color.length===7 ? newHabit.color : '#c67139';
+    const icons = ['🎯','🏃','🧘','💧','📚','💪','🥗','☀️','🎸','✍️','🏊','🚴','😴','🧠','🫁'];
+    const colors = ['#c67139','#7a8a5e','#4a90d9','#c0504a','#8a6a4a','#7b5ea7'];
+    const freqs = ['Daily','Weekdays','3× / week','Weekly'];
+    const types = [['binary','✓ Done/not done'],['quantity','# Quantity'],['duration','⏱ Duration']];
+    const cats = ['Health','Fitness','Wellness','Growth','Work','Personal'];
+
+    const iconOptions = icons.map(icon => ({
+      icon, onClick:()=>this.setState({newHabit:{...newHabit,icon}}),
+      style:{width:44,height:44,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,cursor:'pointer',background:newHabit.icon===icon?rgba(nhColor,0.25):'#ebddc5',border:newHabit.icon===icon?`2px solid ${nhColor}`:'2px solid transparent'},
+    }));
+    const colorOptions = colors.map(c => ({
+      onClick:()=>this.setState({newHabit:{...newHabit,color:c}}),
+      style:{width:36,height:36,borderRadius:'999px',background:c,cursor:'pointer',boxSizing:'border-box',border:newHabit.color===c?'3px solid #201e1d':'3px solid transparent'},
+    }));
+    const freqOptions = freqs.map(f => ({
+      label:f, onClick:()=>this.setState({newHabit:{...newHabit,freq:f}}),
+      style:{padding:'13px 16px',borderRadius:14,cursor:'pointer',fontWeight:600,fontSize:14,background:newHabit.freq===f?nhColor:'#fff',color:newHabit.freq===f?'#fff':'#201e1d',border:newHabit.freq===f?'none':'1.5px solid #ebddc5'},
+    }));
+    const typeOptions = types.map(([t,label]) => ({
+      label, onClick:()=>this.setState({newHabit:{...newHabit,type:t}}),
+      style:{flex:'1 1 0',padding:'11px 8px',borderRadius:12,cursor:'pointer',fontWeight:600,fontSize:12,textAlign:'center',lineHeight:1.3,background:newHabit.type===t?nhColor:'#fff',color:newHabit.type===t?'#fff':'#201e1d',border:newHabit.type===t?'none':'1.5px solid #ebddc5'},
+    }));
+    const catOptions = cats.map(cat => ({
+      label:cat, onClick:()=>this.setState({newHabit:{...newHabit,category:cat}}),
+      style:{padding:'8px 14px',borderRadius:999,cursor:'pointer',fontWeight:600,fontSize:13,background:newHabit.category===cat?rgba(nhColor,0.2):'#ebddc5',color:newHabit.category===cat?nhColor:'#82796a',border:newHabit.category===cat?`1.5px solid ${nhColor}`:'1.5px solid transparent'},
+    }));
+
+    const typeLabel = {binary:'Done / not done',quantity:'Quantity',duration:'Duration'}[newHabit.type]||'';
+    const mkTab = n => ({flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,cursor:'pointer',padding:'4px 0',color:tab===n?'#c67139':'#a09786'});
+    const showTab = screen !== 'create';
+
+    return {
+      greeting, dateStr, completedCount, totalCount, pct, R, circ, dash, gap,
+      habitsWithState, celebrating, activeHabit, weekDays, heatmapEl, monthCalEl,
+      iconOptions, colorOptions, freqOptions, typeOptions, catOptions,
+      newHabit, createStep,
+      currentMonthName: monthNames[now.getMonth()],
+      activeHabitName: ah.name||'',
+      activeHabitIcon: ah.icon||'',
+      activeHabitStreak: ah.streak||0,
+      activeHabitLongest: ah.longest||0,
+      activeHabitTotal: ah.totalDone||0,
+      activeHabitRate: ah.totalDone ? Math.min(100,Math.round(ah.totalDone/90*100)) : 0,
+      activeHabitIconStyle: {width:64,height:64,borderRadius:18,display:'flex',alignItems:'center',justifyContent:'center',fontSize:30,background:rgba(ahColor,0.15),flexShrink:0},
+      previewIconStyle: {width:56,height:56,borderRadius:16,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,background:rgba(nhColor,0.2),flexShrink:0},
+      newHabitName: newHabit.name || 'My New Habit',
+      newHabitTypeLabel: typeLabel,
+
+      homeStyle: {display:screen==='home'?'flex':'none',flexDirection:'column',flex:1,overflow:'hidden'},
+      detailStyle: {display:screen==='detail'?'flex':'none',flexDirection:'column',flex:1,overflow:'hidden'},
+      createStyle: {display:screen==='create'?'flex':'none',flexDirection:'column',flex:1,overflow:'hidden'},
+      statsStyle: {display:screen==='stats'?'flex':'none',flexDirection:'column',flex:1,overflow:'hidden'},
+      calStyle: {display:screen==='calendar'?'flex':'none',flexDirection:'column',flex:1,overflow:'hidden'},
+      profileStyle: {display:screen==='profile'?'flex':'none',flexDirection:'column',flex:1,overflow:'hidden'},
+
+      step1Style: {display:createStep===1?'flex':'none',flexDirection:'column',flex:1,padding:'20px',gap:16,overflowY:'auto'},
+      step2Style: {display:createStep===2?'flex':'none',flexDirection:'column',flex:1,padding:'20px',gap:16,overflowY:'auto'},
+      step3Style: {display:createStep===3?'flex':'none',flexDirection:'column',flex:1,padding:'20px',gap:16,overflowY:'auto'},
+      createProgressStyle: {height:'3px',background:nhColor,width:`${Math.round(createStep/3*100)}%`,transition:'width 0.3s ease'},
+
+      tabBarStyle: {display:showTab?'flex':'none',borderTop:'1px solid #ebddc5',background:'#f5ead8',padding:'10px 8px 4px',flexShrink:0},
+      tabTodayItemStyle: mkTab('today'),
+      tabCalItemStyle: mkTab('calendar'),
+      tabStatsItemStyle: mkTab('stats'),
+      tabProfileItemStyle: mkTab('profile'),
+
+      buildStyle: {flex:1,padding:'10px',borderRadius:12,textAlign:'center',cursor:'pointer',fontSize:13,fontWeight:600,background:!newHabit.bad?rgba('#7a8a5e',0.15):'#f5ead8',color:!newHabit.bad?'#7a8a5e':'#a09786',border:!newHabit.bad?'1.5px solid #7a8a5e':'1.5px solid #ebddc5'},
+      quitStyle: {flex:1,padding:'10px',borderRadius:12,textAlign:'center',cursor:'pointer',fontSize:13,fontWeight:600,background:newHabit.bad?rgba('#c0504a',0.15):'#f5ead8',color:newHabit.bad?'#c0504a':'#a09786',border:newHabit.bad?'1.5px solid #c0504a':'1.5px solid #ebddc5'},
+
+      onBack: ()=>this.setState({screen:'home',tab:'today'}),
+      onOpenCreate: ()=>this.setState({screen:'create',createStep:1,newHabit:{name:'',icon:'🎯',color:'#c67139',category:'Health',freq:'Daily',type:'binary',bad:false}}),
+      onNextStep: ()=>this.setState({createStep:Math.min(3,createStep+1)}),
+      onPrevStep: ()=>this.setState({createStep:Math.max(1,createStep-1)}),
+      onSetNewHabitName: (e)=>this.setState({newHabit:{...newHabit,name:e.target.value}}),
+      onSaveHabit: ()=>{
+        if(!newHabit.name.trim())return;
+        const nh={...newHabit,id:Date.now(),streak:0,longest:0,totalDone:0};
+        this.setState({habits:[...habits,nh],screen:'home',tab:'today'});
+      },
+      onSetBuild: ()=>this.setState({newHabit:{...newHabit,bad:false}}),
+      onSetQuit: ()=>this.setState({newHabit:{...newHabit,bad:true}}),
+      onTabToday: ()=>this.setState({tab:'today',screen:'home'}),
+      onTabCal: ()=>this.setState({tab:'calendar',screen:'calendar'}),
+      onTabStats: ()=>this.setState({tab:'stats',screen:'stats'}),
+      onTabProfile: ()=>this.setState({tab:'profile',screen:'profile'}),
+    };
+  }
+}
+</script>
+</body>
+</html>
