@@ -58,12 +58,18 @@ export const palettes: Record<Scheme, Palette> = { light, dark }
 // ThemeProvider swaps its contents (via applyScheme) on a theme change.
 export const colors: Palette = { ...light }
 
+/** Heatmap ramp (empty → full), per scheme. Evenly-stepped so levels read. */
+const heatLight = ['#eee7d9', '#f6cfa2', '#eca25f', '#d17b38', '#a1531f']
+const heatDark = ['#2f2a22', '#5c431f', '#8a622f', '#bd7e3e', '#e59b5f']
+
+/** Live heatmap ramp — mutated in place by applyScheme like `colors`. */
+export const heat: string[] = [...heatLight]
+
 export function applyScheme(scheme: Scheme): void {
   Object.assign(colors, palettes[scheme])
+  const h = scheme === 'dark' ? heatDark : heatLight
+  for (let i = 0; i < h.length; i++) heat[i] = h[i]
 }
-
-/** GitHub-style heatmap ramp (empty → full). */
-export const heat = ['#ebddc5', '#ffc6a5', '#f6a06b', '#d67f48', '#b2622d']
 
 /** hex + alpha → rgba() string. */
 export function rgba(hex: string, a: number): string {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { PanResponder, Pressable, ScrollView, Text, View } from 'react-native'
+import { PanResponder, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { logs as logsRepo, stats as statsRepo } from '@backend/local'
@@ -37,7 +37,10 @@ function formatMonth(iso: string): string {
   return new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
 }
 
-const level = (n: number) => (n <= 0 ? 0 : n >= 4 ? 4 : n)
+// Shade relative to the busiest day in view, so dense data still shows gradients
+// instead of a solid block of the darkest color.
+const levelFor = (n: number, max: number) =>
+  n <= 0 ? 0 : Math.min(4, Math.max(1, Math.round((n / Math.max(1, max)) * 4)))
 
 export default function Calendar() {
   useTheme()
@@ -225,6 +228,7 @@ function MonthGrid({
   const gridStart = startOfWeek(firstOfMonth(monthCursor), 0)
   const cursorMonth = monthOf(monthCursor)
   const atCurrentMonth = cursorMonth >= monthOf(today)
+  const maxN = Math.max(1, ...counts.values())
 
   // Swipe left/right to change month. A ref holds the latest bound + callbacks
   // so the responder (created once) never acts on stale values.
@@ -269,6 +273,7 @@ function MonthGrid({
               const inMonth = monthOf(date) === cursorMonth
               const future = date > today
               const n = counts.get(date) ?? 0
+              const lvl = levelFor(n, maxN)
               const isToday = date === today
               const isSelected = date === selected
               const tappable = inMonth && !future
@@ -286,7 +291,7 @@ function MonthGrid({
                     borderRadius: 10,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: !inMonth ? 'transparent' : n > 0 ? heat[level(n)] : colors.card,
+                    backgroundColor: !inMonth ? 'transparent' : n > 0 ? heat[lvl] : colors.card,
                     borderWidth: isSelected ? 2 : isToday ? 2 : 0,
                     borderColor: isSelected ? colors.ink : colors.accent,
                     opacity: !inMonth ? 0.35 : future ? 0.4 : 1,
@@ -296,7 +301,7 @@ function MonthGrid({
                     style={{
                       fontSize: 13,
                       fontFamily: isToday ? fonts.bold : fonts.body,
-                      color: n >= 3 && inMonth ? '#fff' : colors.ink,
+                      color: lvl >= 3 && inMonth ? '#fff' : colors.ink,
                     }}
                   >
                     {Number(date.slice(8, 10))}
@@ -311,9 +316,8 @@ function MonthGrid({
   )
 }
 
-const CELL = 13
-const CELL_PITCH = CELL + 3 // cell + row/col gap
-const WDAY_COL = 26 // left gutter for weekday labels
+const GAP = 3
+const WDAY_COL = 28 // left gutter for weekday labels
 const WDAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''] // Sun..Sat, GitHub-style
 
 function Heatmap({
@@ -327,7 +331,13 @@ function Heatmap({
   selected: string
   onSelect: (d: string) => void
 }) {
+  const { width } = useWindowDimensions()
   const start = addDays(startOfWeek(today, 0), -((WEEKS - 1) * 7))
+
+  // Size cells to fill the card width (screen − h.margins − card.padding − gutter).
+  const contentW = width - 32 - 32 - WDAY_COL
+  const cell = Math.max(13, Math.floor((contentW - (WEEKS - 1) * GAP) / WEEKS))
+  const pitch = cell + GAP
 
   // Month labels above the column where each new month begins.
   const monthLabels: { x: number; label: string }[] = []
@@ -338,17 +348,18 @@ function Heatmap({
     if (m !== prevMonth) {
       prevMonth = m
       const [y, mm] = d.split('-').map(Number)
-      monthLabels.push({ x: w * CELL_PITCH, label: new Date(y, mm - 1, 1).toLocaleDateString(undefined, { month: 'short' }) })
+      monthLabels.push({ x: w * pitch, label: new Date(y, mm - 1, 1).toLocaleDateString(undefined, { month: 'short' }) })
     }
   }
 
   const values = [...counts.values()]
   const activeDays = values.filter((v) => v > 0).length
   const checkins = values.reduce((a, b) => a + b, 0)
+  const maxN = Math.max(1, ...values)
 
   return (
     <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 16 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
         <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.muted }}>LAST {WEEKS} WEEKS</Text>
         <Text style={{ fontSize: 12, fontFamily: fonts.semibold, color: colors.sub }}>
           {activeDays} active {activeDays === 1 ? 'day' : 'days'} · {checkins} check-in{checkins === 1 ? '' : 's'}
@@ -356,11 +367,11 @@ function Heatmap({
       </View>
 
       {/* Month labels */}
-      <View style={{ height: 14, marginLeft: WDAY_COL }}>
+      <View style={{ height: 15, marginLeft: WDAY_COL }}>
         {monthLabels.map((m) => (
           <Text
             key={m.label + m.x}
-            style={{ position: 'absolute', left: m.x, fontSize: 10, color: colors.muted }}
+            style={{ position: 'absolute', left: m.x, fontSize: 10, fontFamily: fonts.semibold, color: colors.muted }}
           >
             {m.label}
           </Text>
@@ -369,18 +380,18 @@ function Heatmap({
 
       <View style={{ flexDirection: 'row' }}>
         {/* Weekday labels */}
-        <View style={{ width: WDAY_COL, gap: 3 }}>
+        <View style={{ width: WDAY_COL, gap: GAP }}>
           {WDAY_LABELS.map((w, i) => (
-            <View key={i} style={{ height: CELL, justifyContent: 'center' }}>
+            <View key={i} style={{ height: cell, justifyContent: 'center' }}>
               <Text style={{ fontSize: 9, color: colors.muted }}>{w}</Text>
             </View>
           ))}
         </View>
 
         {/* Grid */}
-        <View style={{ flexDirection: 'row', gap: 3 }}>
+        <View style={{ flexDirection: 'row', gap: GAP }}>
           {Array.from({ length: WEEKS }, (_, w) => (
-            <View key={w} style={{ gap: 3 }}>
+            <View key={w} style={{ gap: GAP }}>
               {Array.from({ length: 7 }, (_, d) => {
                 const date = addDays(start, w * 7 + d)
                 const future = date > today
@@ -391,15 +402,15 @@ function Heatmap({
                     key={d}
                     disabled={future}
                     onPress={() => onSelect(date)}
-                    hitSlop={2}
+                    hitSlop={1}
                     accessibilityRole="button"
                     accessibilityLabel={`${formatDay(date)}, ${n} completed`}
                     accessibilityState={{ selected: isSelected }}
                     style={{
-                      width: CELL,
-                      height: CELL,
-                      borderRadius: 3,
-                      backgroundColor: future ? 'transparent' : heat[level(n)],
+                      width: cell,
+                      height: cell,
+                      borderRadius: 4,
+                      backgroundColor: future ? 'transparent' : n > 0 ? heat[levelFor(n, maxN)] : heat[0],
                       borderWidth: isSelected ? 2 : 0,
                       borderColor: colors.ink,
                     }}
@@ -411,10 +422,10 @@ function Heatmap({
         </View>
       </View>
 
-      <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', marginTop: 12, justifyContent: 'flex-end' }}>
+      <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', marginTop: 14, justifyContent: 'flex-end' }}>
         <Text style={{ fontSize: 10, color: colors.muted }}>Less</Text>
         {heat.map((c) => (
-          <View key={c} style={{ width: 11, height: 11, borderRadius: 3, backgroundColor: c }} />
+          <View key={c} style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: c }} />
         ))}
         <Text style={{ fontSize: 10, color: colors.muted }}>More</Text>
       </View>
