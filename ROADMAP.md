@@ -60,7 +60,9 @@ architecture.
 - [ ] Enable leaked-password protection (Supabase Auth → Passwords — dashboard toggle)
 
 **Legal & infra**
-- [ ] Privacy policy + terms of service (required by both stores)
+- [x] Privacy policy + terms of service drafted ([`legal/`](legal/)) — tailored to
+      the app as built. **Remaining:** legal review, fill the `[BRACKET]`
+      placeholders, and host at public URLs linked from the store listing + app.
 - [ ] GDPR/CCPA data export + delete endpoints
 - [ ] Move Supabase off free tier (backups, no auto-pause, SLA)
 
