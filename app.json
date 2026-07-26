@@ -7,7 +7,10 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
+    "icon": "./assets/icon.png",
     "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
       "backgroundColor": "#f5ead8"
     },
     "ios": {
@@ -15,7 +18,11 @@
       "bundleIdentifier": "com.av1yan.habittracker"
     },
     "android": {
-      "package": "com.av1yan.habittracker"
+      "package": "com.av1yan.habittracker",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#c67139"
+      }
     },
     "plugins": ["expo-router"],
     "experiments": {

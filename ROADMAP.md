@@ -29,7 +29,8 @@ architecture.
 - [x] Config plugins: decided — `expo-sqlite`/`expo-font` intentionally omitted
       (work via autolinking / runtime loading; not needed for our usage)
 - [ ] Run `eas login && eas init && eas build` to produce iOS + Android binaries
-- [ ] App icon + splash assets (currently Expo defaults)
+- [x] App icon + splash assets (on-brand checkmark placeholder via
+      `scripts/generate-icons.mjs`) — replace with real artwork before submitting
 - [ ] Apple Developer ($99/yr) + Google Play ($25) accounts; store listings & assets
 - [ ] Submit for review (TestFlight / internal testing first)
 
