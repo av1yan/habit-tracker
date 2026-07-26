@@ -24,6 +24,9 @@ architecture.
   window summary (active days · check-ins).
 - Streak Freeze management screen (Profile → Streak Freeze): balance, explainer,
   and per-habit "Freeze today" actions.
+- Garden tab: each habit is a plant that grows through stages with its streak
+  (seed → seedling → sprout → thriving → flowering → blooming → mighty tree),
+  with progress toward the next stage. The flagship engagement/retention hook.
 
 ---
 
