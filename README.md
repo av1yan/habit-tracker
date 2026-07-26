@@ -8,6 +8,10 @@ heatmap and stats screen — all working offline and syncing across devices.
 Built end-to-end from an MVP design prototype: schema → migrations → typed
 data layer → offline sync engine → mobile app.
 
+<p align="center">
+  <img src="docs/today.png" alt="Today screen — dark mode, showing the completion ring and habit list" width="300" />
+</p>
+
 ## Features
 
 - **Habits** — build or quit habits; binary / quantity / duration types; per-habit
