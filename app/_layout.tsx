@@ -1,5 +1,6 @@
-import { ActivityIndicator, View } from 'react-native'
-import { Stack } from 'expo-router'
+import { useEffect } from 'react'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
+import { Stack, type ErrorBoundaryProps } from 'expo-router'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import { useFonts } from 'expo-font'
@@ -14,6 +15,54 @@ import {
 import { AppProvider } from '@/lib/app-context'
 import { ThemeProvider, useTheme } from '@/lib/theme-context'
 import { colors } from '@/lib/theme'
+import { captureError, initMonitoring } from '@/lib/monitoring'
+
+// Start crash reporting as early as possible (no-op without a DSN).
+void initMonitoring()
+
+// Root error boundary — catches render errors anywhere in the app, reports them,
+// and offers a retry. Styling is self-contained (no theme/safe-area hooks) since
+// it may render when the providers themselves have failed.
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => {
+    captureError(error)
+  }, [error])
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: '#f5ead8',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 28,
+        gap: 12,
+      }}
+    >
+      <Text style={{ fontSize: 40 }}>🙈</Text>
+      <Text style={{ fontSize: 24, fontWeight: '800', color: '#201e1d', textAlign: 'center' }}>
+        Something went wrong
+      </Text>
+      <Text style={{ fontSize: 14, color: '#82796a', textAlign: 'center' }}>
+        The app hit an unexpected error. You can try again.
+      </Text>
+      {typeof __DEV__ !== 'undefined' && __DEV__ && (
+        <Text style={{ fontSize: 12, color: '#a09786', textAlign: 'center' }}>{error.message}</Text>
+      )}
+      <Pressable
+        onPress={retry}
+        style={{
+          marginTop: 8,
+          backgroundColor: '#c67139',
+          borderRadius: 999,
+          paddingHorizontal: 24,
+          paddingVertical: 14,
+        }}
+      >
+        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Try again</Text>
+      </Pressable>
+    </View>
+  )
+}
 
 function Navigator() {
   const { scheme } = useTheme() // subscribe so nav chrome follows the theme

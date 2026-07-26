@@ -127,3 +127,16 @@ npm run submit:android           # upload to Google Play
 > `app.json` — both modules work via autolinking / runtime loading for our usage,
 > so builds don't need them. Re-add them only if you adopt a build-time feature
 > they gate (do it on Node 20).
+
+## Crash reporting (Sentry)
+
+Wired in [`lib/monitoring.ts`](lib/monitoring.ts) + a root error boundary in
+`app/_layout.tsx`. It's **inert unless `EXPO_PUBLIC_SENTRY_DSN` is set**, and the
+SDK is imported lazily — so Expo Go and local dev are unaffected.
+
+To enable on real builds:
+1. Create a Sentry project; set `EXPO_PUBLIC_SENTRY_DSN` in `.env`.
+2. For source-map upload, add the `@sentry/react-native/expo` config plugin to
+   `app.json` (build on Node 20) and provide a `SENTRY_AUTH_TOKEN` to EAS.
+
+Report errors from anywhere with `captureError(err, context?)`.

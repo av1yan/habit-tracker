@@ -62,7 +62,11 @@ architecture.
 - [ ] E2E smoke tests (Maestro or Detox) for core flows
 
 **Observability**
-- [ ] Crash/error reporting (Sentry) + app error boundaries
+- [x] Crash/error reporting (Sentry via `lib/monitoring.ts` — inert without a DSN,
+      loaded lazily so Expo Go still works) + a root error boundary; sync errors
+      report through it too
+- [ ] Wire Sentry for production builds: set `EXPO_PUBLIC_SENTRY_DSN`, add the
+      `@sentry/react-native/expo` config plugin (on Node 20) for source-map upload
 - [ ] Basic product analytics
 - [ ] Server logging/alerting
 

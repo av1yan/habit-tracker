@@ -19,6 +19,7 @@ import { createExpoAdapter } from '@backend/local'
 import type { LocalDB } from '@backend/local'
 import { bootstrapOffline, onSignIn, onSignOut, type OfflineStack } from '@backend/offline'
 import { rescheduleReminders } from './notifications'
+import { captureError } from './monitoring'
 
 interface AppState {
   ready: boolean
@@ -75,6 +76,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         onError: (err, ctx) => {
           const msg = err instanceof Error ? err.message : String(err)
           console.warn('[sync] error', ctx, msg)
+          captureError(err, { source: 'sync', ...ctx })
         },
       })
       stackRef.current = stack
