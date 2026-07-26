@@ -12,10 +12,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.habittracker"
+      "bundleIdentifier": "com.av1yan.habittracker"
     },
     "android": {
-      "package": "com.example.habittracker"
+      "package": "com.av1yan.habittracker"
     },
     "plugins": ["expo-router"],
     "experiments": {

@@ -85,6 +85,45 @@ those files directly.
   with `expo-font` + `@expo-google-fonts/*` if you want an exact match.
 - **Create flow** is condensed from the prototype's 3-step wizard into one
   scrollable form with the same fields.
-- **Reminders UI** is a placeholder row on Profile; scheduling local
-  notifications (`expo-notifications`) against the `reminders` table is a
-  follow-up.
+- **Reminders UI** — a management screen (Profile → Reminders) with create/edit
+  and per-reminder toggles, driving on-device local notifications.
+
+## Building for the stores (EAS)
+
+Build config lives in [`eas.json`](eas.json). Build servers are pinned to Node 20
+(`node` field per profile) to avoid the Node-26 config-load issue seen in dev.
+
+**Prerequisites**
+- An [Expo account](https://expo.dev) (free) and `eas-cli`: `npm install -g eas-cli`
+- Run on **Node 20** locally (`.nvmrc` pins it; `nvm use`)
+- Apple Developer + Google Play accounts for store submission
+
+**First-time setup**
+```bash
+eas login
+eas init          # links the project and writes extra.eas.projectId into app.json
+```
+
+**Build profiles** (`eas.json`)
+- `development` — dev client, iOS simulator build for local testing
+- `preview` — internal-distribution release build (TestFlight / ad-hoc)
+- `production` — store build (auto-increments build number)
+
+**Commands** (also wired as npm scripts)
+```bash
+npm run build:preview            # internal test build (iOS + Android)
+npm run build:ios                # production iOS build
+npm run build:android            # production Android build
+npm run submit:ios               # upload to App Store Connect
+npm run submit:android           # upload to Google Play
+```
+
+**Still needed before submitting** (see [`ROADMAP.md`](ROADMAP.md) Phase 1)
+- App icon + splash assets (currently Expo defaults)
+- Password reset, Sign in with Apple, account deletion
+- Privacy policy + terms; a paid Supabase plan
+
+> Note: `expo-sqlite` / `expo-font` config plugins are intentionally omitted from
+> `app.json` — both modules work via autolinking / runtime loading for our usage,
+> so builds don't need them. Re-add them only if you adopt a build-time feature
+> they gate (do it on Node 20).

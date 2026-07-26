@@ -23,10 +23,13 @@ architecture.
 ## Phase 1 — Ship blockers (can't launch without these)
 
 **Builds & distribution**
-- [ ] Configure **EAS Build**; produce iOS + Android release binaries
-- [ ] Restore `expo-sqlite` / `expo-font` config plugins in `app.json` (removed as a
-      Node 26 dev workaround) and build on Node 20
-- [ ] Real bundle identifiers (replace `com.example.habittracker`), app icon, splash
+- [x] **EAS Build config** — `eas.json` (dev/preview/production profiles), Node 20
+      pinned for builds, `.nvmrc`, npm build/submit scripts (see [`MOBILE.md`](MOBILE.md))
+- [x] Real bundle identifiers (`com.av1yan.habittracker`)
+- [x] Config plugins: decided — `expo-sqlite`/`expo-font` intentionally omitted
+      (work via autolinking / runtime loading; not needed for our usage)
+- [ ] Run `eas login && eas init && eas build` to produce iOS + Android binaries
+- [ ] App icon + splash assets (currently Expo defaults)
 - [ ] Apple Developer ($99/yr) + Google Play ($25) accounts; store listings & assets
 - [ ] Submit for review (TestFlight / internal testing first)
 
