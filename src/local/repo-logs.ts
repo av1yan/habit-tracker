@@ -148,6 +148,23 @@ export async function getToday(
   }
 }
 
+/**
+ * Completed (habit_id, log_date) pairs across all habits in a date range — for
+ * the per-habit heatmap grid. Frozen days count as kept.
+ */
+export async function completionsByHabit(
+  local: LocalDB,
+  from: string,
+  to: string,
+): Promise<{ habit_id: string; log_date: string }[]> {
+  return local.raw<{ habit_id: string; log_date: string }>(
+    `SELECT habit_id, log_date FROM habit_logs
+     WHERE deleted_at IS NULL AND status IN ('completed', 'frozen')
+       AND log_date >= ? AND log_date <= ?`,
+    [from, to],
+  )
+}
+
 // -- Week strip -------------------------------------------------------------
 
 export async function getWeek(

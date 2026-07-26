@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { PanResponder, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import { logs as logsRepo, stats as statsRepo } from '@backend/local'
+import { habits as habitsRepo, logs as logsRepo, stats as statsRepo } from '@backend/local'
+import type { Habit } from '@backend/local'
 import type { TodayView } from '@backend/data'
 import { addDays, startOfWeek, toLocalISODate } from '@backend/data'
 import { useApp } from '@/lib/app-context'
@@ -10,7 +11,6 @@ import { useTheme } from '@/lib/theme-context'
 import { Loading } from '@/components/ScreenState'
 import { colors, fonts, heat, rgba } from '@/lib/theme'
 
-const WEEKS = 15
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -53,24 +53,45 @@ export default function Calendar() {
   const [monthCursor, setMonthCursor] = useState(firstOfMonth(today))
   const [selected, setSelected] = useState(today)
   const [counts, setCounts] = useState<Map<string, number>>(new Map())
+  const [perHabit, setPerHabit] = useState<PerHabitData | null>(null)
   const [day, setDay] = useState<TodayView | null>(null)
 
-  // Completion counts for whatever range the active view needs.
+  // Month view: per-day completion counts for the visible month grid.
   useEffect(() => {
-    if (!local) return
+    if (!local || view !== 'month') return
     let alive = true
-    const gridStart =
-      view === 'heatmap'
-        ? addDays(startOfWeek(today, 0), -((WEEKS - 1) * 7))
-        : startOfWeek(firstOfMonth(monthCursor), 0)
-    const gridEnd = view === 'heatmap' ? today : addDays(gridStart, 41)
+    const gridStart = startOfWeek(firstOfMonth(monthCursor), 0)
+    const gridEnd = addDays(gridStart, 41)
     statsRepo.heatmap(local, gridStart, gridEnd).then((rows) => {
       if (alive) setCounts(new Map(rows.map((c) => [c.log_date, c.completions])))
     })
     return () => {
       alive = false
     }
-  }, [local, view, monthCursor, today, version])
+  }, [local, view, monthCursor, version])
+
+  // Heatmap view: per-habit completion across the last HEATMAP_DAYS days.
+  useEffect(() => {
+    if (!local || view !== 'heatmap') return
+    let alive = true
+    setPerHabit(null)
+    const from = addDays(today, -(HEATMAP_DAYS - 1))
+    Promise.all([habitsRepo.listHabits(local), logsRepo.completionsByHabit(local, from, today)]).then(
+      ([hs, rows]) => {
+        const done = new Map<string, Set<string>>()
+        for (const r of rows) {
+          let s = done.get(r.habit_id)
+          if (!s) done.set(r.habit_id, (s = new Set()))
+          s.add(r.log_date)
+        }
+        const days = Array.from({ length: HEATMAP_DAYS }, (_, i) => addDays(from, i))
+        if (alive) setPerHabit({ days, habits: hs, done })
+      },
+    )
+    return () => {
+      alive = false
+    }
+  }, [local, view, today, version])
 
   // Selected-day habit breakdown.
   useEffect(() => {
@@ -133,7 +154,13 @@ export default function Calendar() {
           onSelect={setSelected}
         />
       ) : (
-        <Heatmap today={today} counts={counts} selected={selected} onSelect={setSelected} />
+        <PerHabitGrid
+          data={perHabit}
+          today={today}
+          selected={selected}
+          onSelect={setSelected}
+          onOpenHabit={(id) => router.push(`/habit/${id}`)}
+        />
       )}
 
       {/* Selected-day detail */}
@@ -321,119 +348,138 @@ function MonthGrid({
   )
 }
 
-const GAP = 3
-const WDAY_COL = 28 // left gutter for weekday labels
-const WDAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''] // Sun..Sat, GitHub-style
+const HEATMAP_DAYS = 14
+const WEEKDAY_INITIAL = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
-function Heatmap({
+interface PerHabitData {
+  days: string[]
+  habits: Habit[]
+  done: Map<string, Set<string>>
+}
+
+function dowOf(iso: string): number {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).getDay()
+}
+
+// Per-habit grid: one row per habit, last HEATMAP_DAYS days, each cell in the
+// habit's own color when completed — so you can see *which* habits you're
+// keeping up, not just how many.
+function PerHabitGrid({
+  data,
   today,
-  counts,
   selected,
   onSelect,
+  onOpenHabit,
 }: {
+  data: PerHabitData | null
   today: string
-  counts: Map<string, number>
   selected: string
   onSelect: (d: string) => void
+  onOpenHabit: (id: string) => void
 }) {
   const { width } = useWindowDimensions()
-  const start = addDays(startOfWeek(today, 0), -((WEEKS - 1) * 7))
-
-  // Size cells to fill the card width (screen − h.margins − card.padding − gutter).
-  const contentW = width - 32 - 32 - WDAY_COL
-  const cell = Math.max(13, Math.floor((contentW - (WEEKS - 1) * GAP) / WEEKS))
-  const pitch = cell + GAP
-
-  // Month labels above the column where each new month begins.
-  const monthLabels: { x: number; label: string }[] = []
-  let prevMonth = ''
-  for (let w = 0; w < WEEKS; w++) {
-    const d = addDays(start, w * 7)
-    const m = monthOf(d)
-    if (m !== prevMonth) {
-      prevMonth = m
-      const [y, mm] = d.split('-').map(Number)
-      monthLabels.push({ x: w * pitch, label: new Date(y, mm - 1, 1).toLocaleDateString(undefined, { month: 'short' }) })
-    }
-  }
-
-  const values = [...counts.values()]
-  const activeDays = values.filter((v) => v > 0).length
-  const checkins = values.reduce((a, b) => a + b, 0)
-  const maxN = Math.max(1, ...values)
+  const LABEL_W = 104
+  const GAP = 3
+  const contentW = width - 32 - 32 - LABEL_W
+  const cell = Math.max(12, Math.floor((contentW - (HEATMAP_DAYS - 1) * GAP) / HEATMAP_DAYS))
 
   return (
     <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 16 }}>
       <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
-        <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.muted }}>LAST {WEEKS} WEEKS</Text>
-        <Text style={{ fontSize: 12, fontFamily: fonts.semibold, color: colors.sub }}>
-          {activeDays} active {activeDays === 1 ? 'day' : 'days'} · {checkins} check-in{checkins === 1 ? '' : 's'}
+        <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.muted }}>PER HABIT</Text>
+        <Text style={{ fontSize: 12, fontFamily: fonts.semibold, color: colors.sub }}>last {HEATMAP_DAYS} days</Text>
+      </View>
+
+      {!data ? (
+        <Loading />
+      ) : data.habits.length === 0 ? (
+        <Text style={{ fontSize: 13, fontFamily: fonts.body, color: colors.muted, paddingVertical: 8 }}>
+          Add a habit to start filling this in.
         </Text>
-      </View>
-
-      {/* Month labels */}
-      <View style={{ height: 15, marginLeft: WDAY_COL }}>
-        {monthLabels.map((m) => (
-          <Text
-            key={m.label + m.x}
-            style={{ position: 'absolute', left: m.x, fontSize: 10, fontFamily: fonts.semibold, color: colors.muted }}
-          >
-            {m.label}
-          </Text>
-        ))}
-      </View>
-
-      <View style={{ flexDirection: 'row' }}>
-        {/* Weekday labels */}
-        <View style={{ width: WDAY_COL, gap: GAP }}>
-          {WDAY_LABELS.map((w, i) => (
-            <View key={i} style={{ height: cell, justifyContent: 'center' }}>
-              <Text style={{ fontSize: 9, color: colors.muted }}>{w}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Grid */}
-        <View style={{ flexDirection: 'row', gap: GAP }}>
-          {Array.from({ length: WEEKS }, (_, w) => (
-            <View key={w} style={{ gap: GAP }}>
-              {Array.from({ length: 7 }, (_, d) => {
-                const date = addDays(start, w * 7 + d)
-                const future = date > today
-                const n = counts.get(date) ?? 0
-                const isSelected = date === selected
+      ) : (
+        <>
+          {/* Weekday axis */}
+          <View style={{ flexDirection: 'row', marginBottom: 8 }}>
+            <View style={{ width: LABEL_W }} />
+            <View style={{ flexDirection: 'row', gap: GAP, flex: 1 }}>
+              {data.days.map((d) => {
+                const isToday = d === today
+                const isSel = d === selected
                 return (
                   <Pressable
                     key={d}
-                    disabled={future}
-                    onPress={() => onSelect(date)}
-                    hitSlop={1}
+                    onPress={() => onSelect(d)}
                     accessibilityRole="button"
-                    accessibilityLabel={`${formatDay(date)}, ${n} completed`}
-                    accessibilityState={{ selected: isSelected }}
-                    style={{
-                      width: cell,
-                      height: cell,
-                      borderRadius: 4,
-                      backgroundColor: future ? 'transparent' : n > 0 ? heat[levelFor(n, maxN)] : heat[0],
-                      borderWidth: isSelected ? 2 : 0,
-                      borderColor: colors.ink,
-                    }}
-                  />
+                    accessibilityLabel={formatDay(d)}
+                    style={{ width: cell, alignItems: 'center' }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 9,
+                        fontFamily: isToday || isSel ? fonts.bold : fonts.body,
+                        color: isToday ? colors.accent : isSel ? colors.ink : colors.muted,
+                      }}
+                    >
+                      {WEEKDAY_INITIAL[dowOf(d)]}
+                    </Text>
+                  </Pressable>
                 )
               })}
             </View>
-          ))}
-        </View>
-      </View>
+          </View>
 
-      <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center', marginTop: 14, justifyContent: 'flex-end' }}>
-        <Text style={{ fontSize: 10, color: colors.muted }}>Less</Text>
-        {heat.map((c) => (
-          <View key={c} style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: c }} />
-        ))}
-        <Text style={{ fontSize: 10, color: colors.muted }}>More</Text>
-      </View>
+          {/* Habit rows */}
+          <View style={{ gap: 6 }}>
+            {data.habits.map((h) => {
+              const set = data.done.get(h.id)
+              return (
+                <View key={h.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Pressable
+                    onPress={() => onOpenHabit(h.id)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${h.name}, open details`}
+                    style={{ width: LABEL_W, flexDirection: 'row', alignItems: 'center', gap: 6, paddingRight: 8 }}
+                  >
+                    <Text style={{ fontSize: 15 }}>{h.icon}</Text>
+                    <Text numberOfLines={1} style={{ flex: 1, fontSize: 12, fontFamily: fonts.semibold, color: colors.ink }}>
+                      {h.name}
+                    </Text>
+                  </Pressable>
+                  <View style={{ flexDirection: 'row', gap: GAP, flex: 1 }}>
+                    {data.days.map((d) => {
+                      const done = set?.has(d)
+                      const isSel = d === selected
+                      return (
+                        <Pressable
+                          key={d}
+                          onPress={() => onSelect(d)}
+                          hitSlop={1}
+                          accessibilityRole="button"
+                          accessibilityLabel={`${h.name}, ${formatDay(d)}, ${done ? 'done' : 'not done'}`}
+                          accessibilityState={{ selected: isSel }}
+                          style={{
+                            width: cell,
+                            height: cell,
+                            borderRadius: 4,
+                            backgroundColor: done ? h.color : rgba(h.color, 0.16),
+                            borderWidth: isSel ? 1.5 : 0,
+                            borderColor: colors.ink,
+                          }}
+                        />
+                      )
+                    })}
+                  </View>
+                </View>
+              )
+            })}
+          </View>
+
+          <Text style={{ fontSize: 11, fontFamily: fonts.body, color: colors.muted, marginTop: 14, lineHeight: 16 }}>
+            Filled = done that day. Tap a day for details, or a habit to open it.
+          </Text>
+        </>
+      )}
     </View>
   )
 }
