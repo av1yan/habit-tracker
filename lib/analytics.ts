@@ -12,9 +12,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 const KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY
 const HOST = (process.env.EXPO_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com').replace(/\/+$/, '')
 const ANON_KEY = 'analytics_anon_id'
+const OPTOUT_KEY = 'analytics_opt_out'
 
 let userId: string | null = null
 let anonId: string | null = null
+let optedOut: boolean | null = null // null = not yet loaded from storage
+
+async function isOptedOut(): Promise<boolean> {
+  if (optedOut === null) {
+    optedOut = (await AsyncStorage.getItem(OPTOUT_KEY).catch(() => null)) === '1'
+  }
+  return optedOut
+}
+
+/** Current opt-out setting (defaults to opted-in / false). For the settings UI. */
+export async function loadAnalyticsOptOut(): Promise<boolean> {
+  return isOptedOut()
+}
+
+/** Persist the user's choice. When opted out, `track` sends nothing. */
+export async function setAnalyticsOptOut(value: boolean): Promise<void> {
+  optedOut = value
+  await AsyncStorage.setItem(OPTOUT_KEY, value ? '1' : '0').catch(() => {})
+}
 
 async function distinctId(): Promise<string> {
   if (userId) return userId
@@ -47,6 +67,7 @@ export async function track(event: string, properties?: Record<string, unknown>)
     if (typeof __DEV__ !== 'undefined' && __DEV__) console.log('[analytics]', event, properties ?? '')
     return
   }
+  if (await isOptedOut()) return
   try {
     await fetch(`${HOST}/capture/`, {
       method: 'POST',

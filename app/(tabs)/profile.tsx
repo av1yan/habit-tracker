@@ -1,4 +1,5 @@
-import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native'
+import { useEffect, useState } from 'react'
+import { Alert, Linking, Pressable, ScrollView, Switch, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
 import { profile as profileRepo } from '@backend/local'
@@ -8,6 +9,7 @@ import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme, type ThemePref } from '@/lib/theme-context'
 import { PRIVACY_URL, TERMS_URL } from '@/lib/legal'
+import { loadAnalyticsOptOut, setAnalyticsOptOut } from '@/lib/analytics'
 import { colors, fonts } from '@/lib/theme'
 
 export default function Profile() {
@@ -15,6 +17,11 @@ export default function Profile() {
   const { session, signOut } = useApp()
   const { pref, setPref } = useTheme()
   const { data } = useLocalData((l) => profileRepo.getProfile(l))
+
+  const [shareAnalytics, setShareAnalytics] = useState(true)
+  useEffect(() => {
+    loadAnalyticsOptOut().then((out) => setShareAnalytics(!out))
+  }, [])
 
   const confirmDeleteAccount = () => {
     Alert.alert(
@@ -128,6 +135,24 @@ export default function Profile() {
               })}
             </View>
           </View>
+        </View>
+
+        <Divider />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <Text style={{ fontSize: 20, width: 28 }}>📊</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 14, fontFamily: fonts.semibold, color: colors.ink }}>Share usage data</Text>
+            <Text style={{ fontSize: 12, fontFamily: fonts.body, color: colors.sub }}>Anonymous, helps improve the app</Text>
+          </View>
+          <Switch
+            value={shareAnalytics}
+            onValueChange={(v) => {
+              setShareAnalytics(v)
+              void setAnalyticsOptOut(!v)
+            }}
+            accessibilityLabel="Share anonymous usage data"
+            trackColor={{ true: colors.accent, false: colors.track }}
+          />
         </View>
       </View>
 
