@@ -82,7 +82,11 @@ export default function Profile() {
       <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 16, gap: 14 }}>
         <Link href="/streak-freeze" asChild>
           <Pressable accessibilityRole="button" accessibilityLabel="Streak Freeze">
-            <Row emoji="🧊" title="Streak Freeze" sub={`${data?.streak_freeze_balance ?? 0} freezes available`} />
+            <Row
+              emoji="🧊"
+              title="Streak Freeze"
+              sub={`${data?.streak_freeze_balance ?? 0} freeze${(data?.streak_freeze_balance ?? 0) === 1 ? '' : 's'} available`}
+            />
           </Pressable>
         </Link>
         <Divider />
