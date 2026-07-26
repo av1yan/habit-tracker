@@ -154,9 +154,23 @@ Wired in [`lib/monitoring.ts`](lib/monitoring.ts) + a root error boundary in
 `app/_layout.tsx`. It's **inert unless `EXPO_PUBLIC_SENTRY_DSN` is set**, and the
 SDK is imported lazily — so Expo Go and local dev are unaffected.
 
-To enable on real builds:
-1. Create a Sentry project; set `EXPO_PUBLIC_SENTRY_DSN` in `.env`.
-2. For source-map upload, add the `@sentry/react-native/expo` config plugin to
-   `app.json` (build on Node 20) and provide a `SENTRY_AUTH_TOKEN` to EAS.
+**Source-map upload** is wired via [`app.config.ts`](app.config.ts), which adds the
+`@sentry/react-native/expo` config plugin **only when `SENTRY_ORG` + `SENTRY_PROJECT`
+are set** — so local/Expo Go builds skip it and stay untouched. Symbolicated stack
+traces in production just need the env below.
+
+To turn Sentry on for release builds (build on Node 20):
+1. Create a Sentry project and grab the DSN + org/project slugs.
+2. Set the runtime DSN and the build-time upload vars as EAS values:
+   ```bash
+   # runtime (baked into the JS bundle — EXPO_PUBLIC_ is not secret)
+   eas env:create --name EXPO_PUBLIC_SENTRY_DSN --value "https://…@…ingest.sentry.io/…"
+   eas env:create --name SENTRY_ORG     --value "your-org"
+   eas env:create --name SENTRY_PROJECT --value "your-project"
+   # secret — used only to upload source maps at build time
+   eas secret:create --name SENTRY_AUTH_TOKEN --value "sntrys_…"
+   ```
+3. Build as usual (`npm run build:ios` / `build:android`). Without these vars the
+   plugin is skipped and builds still succeed (just no symbolication).
 
 Report errors from anywhere with `captureError(err, context?)`.

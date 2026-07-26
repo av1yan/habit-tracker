@@ -80,8 +80,11 @@ architecture.
 - [x] Crash/error reporting (Sentry via `lib/monitoring.ts` — inert without a DSN,
       loaded lazily so Expo Go still works) + a root error boundary; sync errors
       report through it too
-- [ ] Wire Sentry for production builds: set `EXPO_PUBLIC_SENTRY_DSN`, add the
-      `@sentry/react-native/expo` config plugin (on Node 20) for source-map upload
+- [x] Wire Sentry for production builds — source-map upload plugin is added
+      conditionally via `app.config.ts` (only when `SENTRY_ORG`/`SENTRY_PROJECT`
+      are set, so Expo Go is untouched). **Remaining:** set `EXPO_PUBLIC_SENTRY_DSN`,
+      `SENTRY_ORG`, `SENTRY_PROJECT`, and the `SENTRY_AUTH_TOKEN` secret in EAS
+      (see [`MOBILE.md`](MOBILE.md)).
 - [ ] Basic product analytics
 - [ ] Server logging/alerting
 
