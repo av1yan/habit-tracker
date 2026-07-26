@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { Link, Redirect } from 'expo-router'
+import { updateProfile } from '@backend/data'
 import { isConfigured, supabase } from '@/lib/supabase'
 import { useApp } from '@/lib/app-context'
 import { useTheme } from '@/lib/theme-context'
@@ -64,7 +65,17 @@ export default function SignIn() {
         provider: 'apple',
         token: credential.identityToken,
       })
-      if (error) setError(error.message)
+      if (error) {
+        setError(error.message)
+        return
+      }
+      // Apple only returns the user's name on the *first* authorization — capture
+      // it into the profile then (best-effort; it syncs down to the local mirror).
+      const name = [credential.fullName?.givenName, credential.fullName?.familyName]
+        .filter(Boolean)
+        .join(' ')
+        .trim()
+      if (name) updateProfile(supabase, { display_name: name }).catch(() => {})
       // On success, AppProvider's auth listener flips `session` and we redirect.
     } catch (e) {
       // The user tapping Cancel isn't an error worth surfacing.
