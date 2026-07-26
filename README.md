@@ -56,7 +56,8 @@ supabase/
 "Habit Tracker MVP Design/"   The original design prototype (dc.html)
 ```
 
-See also: [`BACKEND_SCHEMA.md`](BACKEND_SCHEMA.md) (data model rationale),
+See also: [`ROADMAP.md`](ROADMAP.md) (path to production),
+[`BACKEND_SCHEMA.md`](BACKEND_SCHEMA.md) (data model rationale),
 [`MOBILE.md`](MOBILE.md) (app details), [`supabase/migrations/README.md`](supabase/migrations/README.md),
 and [`src/sync/README.md`](src/sync/README.md) (sync architecture).
 
