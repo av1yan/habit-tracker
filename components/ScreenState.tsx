@@ -44,7 +44,7 @@ export function ErrorState({ message, onRetry }: { message?: string; onRetry?: (
       {onRetry ? (
         <Pressable
           onPress={onRetry}
-          style={{ marginTop: 8, backgroundColor: colors.accent, borderRadius: 999, paddingHorizontal: 22, paddingVertical: 12 }}
+          style={{ marginTop: 8, backgroundColor: colors.btn, borderRadius: 999, paddingHorizontal: 22, paddingVertical: 12 }}
         >
           <Text style={{ color: '#fff', fontFamily: fonts.bold, fontSize: 14 }}>Try again</Text>
         </Pressable>

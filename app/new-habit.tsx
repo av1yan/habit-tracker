@@ -214,7 +214,7 @@ export default function NewHabit() {
                 onPress={next}
                 accessibilityRole="button"
                 accessibilityLabel="Continue"
-                style={{ flex: 2, backgroundColor: colors.accent, borderRadius: 999, padding: 14, alignItems: 'center' }}
+                style={{ flex: 2, backgroundColor: colors.btn, borderRadius: 999, padding: 14, alignItems: 'center' }}
               >
                 <Text style={{ color: '#fff', fontFamily: fonts.bold, fontSize: 14 }}>Continue →</Text>
               </Pressable>
@@ -311,7 +311,7 @@ function PrimaryButton({ label, onPress, disabled }: { label: string; onPress: (
       accessibilityLabel={label}
       accessibilityState={{ disabled: !!disabled }}
       style={{
-        backgroundColor: colors.accent,
+        backgroundColor: colors.btn,
         borderRadius: 999,
         padding: 16,
         alignItems: 'center',

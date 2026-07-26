@@ -180,7 +180,7 @@ export default function HabitDetail() {
           <Text style={{ fontSize: 14, fontWeight: '600', color: colors.ink }}>🧊 Streak Freeze</Text>
           <Text style={{ fontSize: 12, color: colors.sub, marginTop: 2 }}>Protect today's streak</Text>
         </View>
-        <View style={{ backgroundColor: colors.accent, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 }}>
+        <View style={{ backgroundColor: colors.btn, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 }}>
           <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12 }}>Use one</Text>
         </View>
       </Pressable>

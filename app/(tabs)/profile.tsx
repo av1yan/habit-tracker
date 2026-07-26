@@ -106,7 +106,7 @@ export default function Profile() {
                       paddingVertical: 8,
                       borderRadius: 10,
                       alignItems: 'center',
-                      backgroundColor: active ? colors.accent : colors.card,
+                      backgroundColor: active ? colors.btn : colors.card,
                     }}
                   >
                     <Text

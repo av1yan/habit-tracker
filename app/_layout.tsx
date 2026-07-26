@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { ActivityIndicator, Pressable, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native'
 import { Stack, type ErrorBoundaryProps } from 'expo-router'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
@@ -20,6 +20,20 @@ import { captureError, initMonitoring } from '@/lib/monitoring'
 
 // Start crash reporting as early as possible (no-op without a DSN).
 void initMonitoring()
+
+// Dynamic Type: text honors the OS font-size setting by default. Cap the
+// multiplier app-wide so very large accessibility sizes scale text up without
+// shattering fixed-height UI (tab bar, streak badges, the toggle check).
+const MAX_FONT_SCALE = 1.6
+type Scalable = { defaultProps?: { maxFontSizeMultiplier?: number } }
+;(Text as unknown as Scalable).defaultProps = {
+  ...(Text as unknown as Scalable).defaultProps,
+  maxFontSizeMultiplier: MAX_FONT_SCALE,
+}
+;(TextInput as unknown as Scalable).defaultProps = {
+  ...(TextInput as unknown as Scalable).defaultProps,
+  maxFontSizeMultiplier: MAX_FONT_SCALE,
+}
 
 // Root error boundary — catches render errors anywhere in the app, reports them,
 // and offers a retry. Styling is self-contained (no theme/safe-area hooks) since

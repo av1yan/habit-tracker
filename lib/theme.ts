@@ -13,16 +13,22 @@ export const fonts = {
   extrabold: 'Figtree_800ExtraBold',
 }
 
+// Colors are tuned to meet WCAG AA (see scripts/contrast-audit.mjs):
+// - `accent` doubles as text/icon color, so it's dark enough to read on the
+//   light surfaces yet light enough to pop on dark ones.
+// - `btn` is the primary-button background: white label text needs a darker
+//   orange than accent-as-text can be, so CTAs use this instead of `accent`.
 const light = {
   bg: '#f5ead8',
   card: '#ebddc5',
   surface: '#ffffff',
   ink: '#201e1d',
-  sub: '#82796a',
-  muted: '#a09786',
-  accent: '#c67139',
-  accentDark: '#b2622d',
-  green: '#7a8a5e',
+  sub: '#6d6455', // AA on bg/surface (was #82796a, large-only)
+  muted: '#766c5a', // 3:1+ everywhere, AA on surface (was #a09786, failing)
+  accent: '#a85e2c', // AA as text on surface; white label AA on this bg
+  accentDark: '#8f4f25',
+  btn: '#a85e2c', // white text 4.9:1
+  green: '#6b784f', // AA as "Achieved" text on white (was #7a8a5e)
   danger: '#c0504a',
   track: '#dcd3c4',
   line: '#ebddc5',
@@ -34,9 +40,10 @@ const dark: typeof light = {
   surface: '#241f19',
   ink: '#f5ead8',
   sub: '#b3a793',
-  muted: '#8a8073',
-  accent: '#d98a52',
+  muted: '#a1988a', // AA on card/surface (was #8a8073)
+  accent: '#d98a52', // stays light — reads well as text on the dark surfaces
   accentDark: '#c67139',
+  btn: '#a85e2c', // white label 4.9:1 (accent itself is too light for white text)
   green: '#9aa877',
   danger: '#dc8079',
   track: '#3a352d',

@@ -54,7 +54,7 @@ export default function ForgotPassword() {
             </Text>
             <Pressable
               onPress={() => router.back()}
-              style={{ backgroundColor: colors.accent, borderRadius: 999, padding: 16, alignItems: 'center' }}
+              style={{ backgroundColor: colors.btn, borderRadius: 999, padding: 16, alignItems: 'center' }}
             >
               <Text style={{ color: '#fff', fontFamily: fonts.bold, fontSize: 15 }}>Back to sign in</Text>
             </Pressable>
@@ -86,7 +86,7 @@ export default function ForgotPassword() {
               onPress={submit}
               disabled={busy || !email.trim()}
               style={{
-                backgroundColor: colors.accent,
+                backgroundColor: colors.btn,
                 borderRadius: 999,
                 padding: 16,
                 alignItems: 'center',

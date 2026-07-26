@@ -90,8 +90,12 @@ architecture.
 - Accessibility:
   - [x] Screen readers — roles, labels, and states on all interactive controls;
         decorative grids collapsed to summarized elements
-  - [ ] Dynamic type (respect OS font-size scaling)
-  - [ ] Contrast audit against WCAG AA
+  - [x] Dynamic type — text honors the OS font-size setting; a global
+        `maxFontSizeMultiplier` cap (1.6) keeps large sizes from breaking
+        fixed-height UI (tab bar, badges)
+  - [x] Contrast audit against WCAG AA — palette retuned so all text/background
+        pairs pass (see `scripts/contrast-audit.mjs`); primary buttons use a
+        dedicated `btn` color for AA-compliant white labels in both themes
 - [ ] Localization / i18n
 - [ ] Reminders robustness: reschedule on device reboot, timezone edge cases
 - [x] Restore the full 3-step create-habit wizard — step 1 name/icon/color,

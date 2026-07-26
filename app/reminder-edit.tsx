@@ -208,7 +208,7 @@ export default function ReminderEdit() {
         onPress={save}
         disabled={!canSave}
         style={{
-          backgroundColor: colors.accent,
+          backgroundColor: colors.btn,
           borderRadius: 999,
           padding: 16,
           alignItems: 'center',

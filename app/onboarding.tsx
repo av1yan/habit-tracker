@@ -135,7 +135,7 @@ export default function Onboarding() {
           onPress={next}
           accessibilityRole="button"
           accessibilityLabel={last ? 'Get started' : 'Next'}
-          style={{ backgroundColor: colors.accent, borderRadius: 999, padding: 17, alignItems: 'center' }}
+          style={{ backgroundColor: colors.btn, borderRadius: 999, padding: 17, alignItems: 'center' }}
         >
           <Text style={{ color: '#fff', fontFamily: fonts.bold, fontSize: 16 }}>
             {last ? 'Get started' : 'Next'}

@@ -98,7 +98,7 @@ export default function SignIn() {
           onPress={submit}
           disabled={busy}
           style={{
-            backgroundColor: colors.accent,
+            backgroundColor: colors.btn,
             borderRadius: 999,
             padding: 16,
             alignItems: 'center',

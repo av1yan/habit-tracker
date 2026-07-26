@@ -72,7 +72,7 @@ export default function ResetPassword() {
           onPress={submit}
           disabled={busy || !password}
           style={{
-            backgroundColor: colors.accent,
+            backgroundColor: colors.btn,
             borderRadius: 999,
             padding: 16,
             alignItems: 'center',
