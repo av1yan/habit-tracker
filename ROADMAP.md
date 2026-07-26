@@ -20,7 +20,10 @@ architecture.
 - Calendar: Month-grid and Heatmap views (toggle); tap any day for a detail panel
   (per-habit completion status + a done/total summary for that date); tap a habit
   there to open its detail. Month grid has prev/next navigation (chevrons or
-  horizontal swipe) with per-month data.
+  horizontal swipe) with per-month data. Heatmap has month/weekday labels and a
+  window summary (active days · check-ins).
+- Streak Freeze management screen (Profile → Streak Freeze): balance, explainer,
+  and per-habit "Freeze today" actions.
 
 ---
 
@@ -101,7 +104,9 @@ architecture.
         pairs pass (see `scripts/contrast-audit.mjs`); primary buttons use a
         dedicated `btn` color for AA-compliant white labels in both themes
 - [ ] Localization / i18n
-- [ ] Reminders robustness: reschedule on device reboot, timezone edge cases
+- [x] Reminders robustness: reschedule on foreground when the timezone or day
+      changes (covers travel across timezones, DST, and reboots the user opens
+      the app after); cold launches already reschedule via the sign-in path
 - [x] Restore the full 3-step create-habit wizard — step 1 name/icon/color,
       step 2 frequency/type/category, step 3 live-preview + build/quit, with a
       progress bar, step counter, and forward/back nav (matches the design prototype)
