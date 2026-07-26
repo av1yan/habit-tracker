@@ -367,6 +367,10 @@ export type Database = {
         Args: { p_habit_id: string; p_date?: string }
         Returns: number
       }
+      delete_account: {
+        Args: Record<string, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

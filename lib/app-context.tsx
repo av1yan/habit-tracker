@@ -11,6 +11,8 @@ import React, {
   useState,
 } from 'react'
 import NetInfo from '@react-native-community/netinfo'
+import * as Linking from 'expo-linking'
+import { useRouter } from 'expo-router'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { createExpoAdapter } from '@backend/local'
@@ -40,6 +42,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const lastUser = useRef<string | null | undefined>(undefined)
 
   const refresh = useCallback(() => setVersion((v) => v + 1), [])
+  const router = useRouter()
 
   useEffect(() => {
     let authSub: { unsubscribe: () => void } | undefined
@@ -95,6 +98,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       netSub?.()
       stackRef.current?.engine.stop()
     }
+  }, [])
+
+  // Handle incoming deep links — specifically the password-recovery link, which
+  // carries a session (PKCE code or token fragment). Establish it, then route to
+  // the reset-password screen.
+  useEffect(() => {
+    const handleUrl = async (url: string | null) => {
+      if (!url) return
+      try {
+        if (url.includes('code=')) {
+          await supabase.auth.exchangeCodeForSession(url)
+        } else if (url.includes('access_token=')) {
+          const frag = url.split('#')[1] ?? url.split('?')[1] ?? ''
+          const params = new URLSearchParams(frag)
+          const access_token = params.get('access_token')
+          const refresh_token = params.get('refresh_token')
+          if (access_token && refresh_token) {
+            await supabase.auth.setSession({ access_token, refresh_token })
+          }
+        }
+        if (url.includes('reset-password') || url.includes('type=recovery')) {
+          router.replace('/reset-password')
+        }
+      } catch {
+        /* malformed / expired link — ignore */
+      }
+    }
+    Linking.getInitialURL().then(handleUrl)
+    const sub = Linking.addEventListener('url', (e) => handleUrl(e.url))
+    return () => sub.remove()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const signOut = useCallback(async () => {

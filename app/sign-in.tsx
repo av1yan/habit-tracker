@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import { Redirect } from 'expo-router'
+import { Link, Redirect } from 'expo-router'
 import { isConfigured, supabase } from '@/lib/supabase'
 import { useApp } from '@/lib/app-context'
 import { useTheme } from '@/lib/theme-context'
@@ -122,6 +122,16 @@ export default function SignIn() {
             {mode === 'signin' ? 'No account? Sign up' : 'Have an account? Sign in'}
           </Text>
         </Pressable>
+
+        {mode === 'signin' && (
+          <Link href="/forgot-password" asChild>
+            <Pressable style={{ alignItems: 'center' }}>
+              <Text style={{ color: colors.muted, fontFamily: fonts.semibold, fontSize: 13 }}>
+                Forgot password?
+              </Text>
+            </Pressable>
+          </Link>
+        )}
       </View>
     </KeyboardAvoidingView>
   )

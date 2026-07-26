@@ -16,6 +16,20 @@ export * from './schema'
 export * from './tables'
 export * from './util'
 
+// Row/enum types, so app code can import them from the local layer too.
+export type {
+  Profile,
+  Habit,
+  HabitLog,
+  Reminder,
+  Achievement,
+  HabitStats,
+  HabitType,
+  HabitFreqType,
+  LogStatus,
+  Weekday,
+} from '../../supabase/types/database.types'
+
 export * as habits from './repo-habits'
 export * as logs from './repo-logs'
 export * as stats from './repo-stats'

@@ -1,7 +1,9 @@
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Link } from 'expo-router'
 import { profile as profileRepo } from '@backend/local'
+import { deleteAccount } from '@backend/data'
+import { supabase } from '@/lib/supabase'
 import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme, type ThemePref } from '@/lib/theme-context'
@@ -12,6 +14,29 @@ export default function Profile() {
   const { session, signOut } = useApp()
   const { pref, setPref } = useTheme()
   const { data } = useLocalData((l) => profileRepo.getProfile(l))
+
+  const confirmDeleteAccount = () => {
+    Alert.alert(
+      'Delete account?',
+      'This permanently deletes your account and all your data. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAccount(supabase)
+            } catch (e) {
+              Alert.alert('Could not delete account', (e as Error).message)
+              return
+            }
+            await signOut()
+          },
+        },
+      ],
+    )
+  }
 
   return (
     <ScrollView
@@ -105,6 +130,12 @@ export default function Profile() {
         }}
       >
         <Text style={{ color: colors.danger, fontFamily: fonts.bold, fontSize: 15 }}>Sign out</Text>
+      </Pressable>
+
+      <Pressable onPress={confirmDeleteAccount} style={{ alignItems: 'center', paddingVertical: 14 }}>
+        <Text style={{ color: colors.muted, fontFamily: fonts.semibold, fontSize: 13 }}>
+          Delete account
+        </Text>
       </Pressable>
     </ScrollView>
   )

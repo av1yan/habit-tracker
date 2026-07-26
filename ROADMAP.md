@@ -35,11 +35,16 @@ architecture.
 - [ ] Submit for review (TestFlight / internal testing first)
 
 **Auth completeness**
-- [ ] Password reset flow
-- [ ] Enforce email verification on signup
-- [ ] **Sign in with Apple** (required by App Store if any social login is offered)
-- [ ] Account deletion (App Store + GDPR requirement)
-- [ ] Enable leaked-password protection (Supabase Auth setting)
+- [x] Password reset flow (forgot-password + reset-password screens + recovery
+      deep-link handler). **Config:** add the app's redirect URL to Supabase Auth →
+      URL Configuration; test the email→link→app flow on a real device.
+- [x] Account deletion (`delete_account()` RPC — cascades all user data; verified;
+      wired to Profile → "Delete account")
+- [ ] **Sign in with Apple** — *not required* while email/password is the only
+      login. Needs `expo-apple-authentication` + a dev/prod build (not Expo Go),
+      an Apple Developer account, and the Supabase Apple provider configured.
+- [ ] Verify email confirmation is enabled (Supabase default: on)
+- [ ] Enable leaked-password protection (Supabase Auth → Passwords — dashboard toggle)
 
 **Legal & infra**
 - [ ] Privacy policy + terms of service (required by both stores)

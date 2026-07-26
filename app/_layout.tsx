@@ -28,6 +28,8 @@ function Navigator() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="sign-in" />
+        <Stack.Screen name="forgot-password" />
+        <Stack.Screen name="reset-password" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="new-habit" options={{ presentation: 'modal' }} />
         <Stack.Screen name="habit/[id]" />

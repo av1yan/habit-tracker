@@ -66,11 +66,13 @@ export async function rescheduleReminders(local: LocalDB): Promise<number> {
         try {
           await Notifications.scheduleNotificationAsync({
             content: { title: `${habit.icon} ${habit.name}`, body: bodyFor(habit) },
+            // expo-notifications 0.28 weekly trigger: weekday 1=Sun..7=Sat
+            // (our days_of_week is 0=Sun..6=Sat), repeats every week.
             trigger: {
-              type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-              weekday: dow + 1, // expo: 1=Sun..7=Sat; our days_of_week: 0=Sun..6=Sat
+              weekday: dow + 1,
               hour,
               minute,
+              repeats: true,
             },
           })
           scheduled++

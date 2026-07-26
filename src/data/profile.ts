@@ -21,3 +21,12 @@ export async function updateProfile(db: DB, patch: UpdateProfilePatch): Promise<
     await db.from('profiles').update(patch).eq('id', id).select('*').single(),
   )
 }
+
+/**
+ * Permanently delete the signed-in user's account and all their data (cascades
+ * from auth.users). Server-side RPC — requires network. Sign out afterward.
+ */
+export async function deleteAccount(db: DB): Promise<void> {
+  const { error } = await db.rpc('delete_account')
+  if (error) throw error
+}
