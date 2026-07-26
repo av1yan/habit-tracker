@@ -61,6 +61,8 @@ export default function Reminders() {
         <Text style={{ fontFamily: fonts.display, fontSize: 22, color: colors.ink, flex: 1 }}>Reminders</Text>
         <Pressable
           onPress={() => router.push('/reminder-edit')}
+          accessibilityRole="button"
+          accessibilityLabel="Add reminder"
           style={{
             width: 36,
             height: 36,
@@ -93,6 +95,8 @@ export default function Reminders() {
           >
             <Pressable
               onPress={() => router.push({ pathname: '/reminder-edit', params: { id: reminder.id } })}
+              accessibilityRole="button"
+              accessibilityLabel={`Edit reminder for ${habit?.name ?? 'habit'}, ${timeLabel(reminder.time_of_day)}`}
               style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}
             >
               <View
@@ -119,6 +123,7 @@ export default function Reminders() {
             <Switch
               value={reminder.enabled}
               onValueChange={(v) => toggle(reminder, v)}
+              accessibilityLabel={`${habit?.name ?? 'Habit'} reminder`}
               trackColor={{ true: colors.accent, false: colors.track }}
             />
           </View>

@@ -115,7 +115,11 @@ export default function HabitDetail() {
         <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, color: colors.muted, marginBottom: 14 }}>
           THIS WEEK
         </Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View
+          accessible
+          accessibilityLabel={`This week: ${week.filter((d) => d.done).length} of ${week.length} days completed`}
+          style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+        >
           {week.map((d, i) => (
             <View key={i} style={{ alignItems: 'center', gap: 6 }}>
               <Text style={{ fontSize: 11, color: colors.muted }}>{d.label}</Text>
@@ -160,6 +164,8 @@ export default function HabitDetail() {
 
       <Pressable
         onPress={useFreeze}
+        accessibilityRole="button"
+        accessibilityLabel="Use a streak freeze to protect today's streak"
         style={{
           margin: 16,
           backgroundColor: rgba(colors.accent, 0.06),

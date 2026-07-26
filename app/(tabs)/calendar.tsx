@@ -36,7 +36,12 @@ export default function Calendar() {
         {loading ? (
           <Loading />
         ) : (
-        <View style={{ flexDirection: 'row', gap: 3 }}>
+        <View
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel={`Daily completion heatmap for the last ${WEEKS} weeks`}
+          style={{ flexDirection: 'row', gap: 3 }}
+        >
           {Array.from({ length: WEEKS }, (_, w) => (
             <View key={w} style={{ gap: 3 }}>
               {Array.from({ length: 7 }, (_, d) => {

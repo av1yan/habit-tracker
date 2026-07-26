@@ -60,6 +60,8 @@ export default function Today() {
       </View>
 
       <View
+        accessibilityRole="summary"
+        accessibilityLabel={`${data?.completedCount ?? 0} of ${data?.totalCount ?? 0} habits completed today, ${data?.pct ?? 0} percent`}
         style={{
           marginHorizontal: 16,
           backgroundColor: colors.card,
@@ -113,6 +115,9 @@ export default function Today() {
             <Pressable
               key={habit.id}
               onPress={() => router.push(`/habit/${habit.id}`)}
+              accessibilityRole="button"
+              accessibilityLabel={`${habit.name}, ${habit.category}`}
+              accessibilityHint="Opens habit details"
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -145,6 +150,9 @@ export default function Today() {
               <Pressable
                 onPress={() => toggle(habit.id)}
                 hitSlop={8}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: done }}
+                accessibilityLabel={`Mark ${habit.name} ${done ? 'not done' : 'done'}`}
                 style={{
                   width: 34,
                   height: 34,

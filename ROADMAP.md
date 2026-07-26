@@ -82,7 +82,8 @@ architecture.
 
 ## Phase 3 — Product polish
 
-- [ ] Loading / empty / error states across screens
+- [x] Loading / empty / error states across screens (reusable `components/ScreenState.tsx`,
+      `loading` flag threaded through `useLocalData`; on Today/Stats/Calendar/habit/Reminders)
 - [ ] Onboarding flow
 - [ ] Accessibility: screen readers, dynamic type, contrast
 - [ ] Localization / i18n

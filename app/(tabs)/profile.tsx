@@ -82,7 +82,7 @@ export default function Profile() {
         <Row emoji="🧊" title="Streak Freeze" sub={`${data?.streak_freeze_balance ?? 0} freezes available`} />
         <Divider />
         <Link href="/reminders" asChild>
-          <Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Reminders, per-habit custom times">
             <Row emoji="🔔" title="Reminders" sub="Per-habit, custom times" />
           </Pressable>
         </Link>
@@ -91,13 +91,16 @@ export default function Profile() {
           <Text style={{ fontSize: 20, width: 28 }}>🌙</Text>
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 14, fontFamily: fonts.semibold, color: colors.ink }}>Appearance</Text>
-            <View style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
+            <View accessibilityRole="radiogroup" style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
               {(['system', 'light', 'dark'] as ThemePref[]).map((opt) => {
                 const active = pref === opt
                 return (
                   <Pressable
                     key={opt}
                     onPress={() => setPref(opt)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={`${opt[0].toUpperCase() + opt.slice(1)} appearance`}
                     style={{
                       flex: 1,
                       paddingVertical: 8,
@@ -121,6 +124,8 @@ export default function Profile() {
 
       <Pressable
         onPress={signOut}
+        accessibilityRole="button"
+        accessibilityLabel="Sign out"
         style={{
           marginHorizontal: 16,
           backgroundColor: colors.surface,
@@ -132,7 +137,7 @@ export default function Profile() {
         <Text style={{ color: colors.danger, fontFamily: fonts.bold, fontSize: 15 }}>Sign out</Text>
       </Pressable>
 
-      <Pressable onPress={confirmDeleteAccount} style={{ alignItems: 'center', paddingVertical: 14 }}>
+      <Pressable onPress={confirmDeleteAccount} accessibilityRole="button" accessibilityLabel="Delete account" style={{ alignItems: 'center', paddingVertical: 14 }}>
         <Text style={{ color: colors.muted, fontFamily: fonts.semibold, fontSize: 13 }}>
           Delete account
         </Text>
