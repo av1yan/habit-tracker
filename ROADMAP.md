@@ -17,8 +17,9 @@ architecture.
 - Expo app: Today / Calendar / Stats / Profile, habit + reminder CRUD, local
   notifications, light/dark theming, email/password auth
 - Deployed to a live Supabase project and verified end-to-end on the simulator
-- Calendar: tap any day in the heatmap for a detail panel (per-habit completion
-  status + a done/total summary for that date); tap a habit there to open its detail
+- Calendar: Month-grid and Heatmap views (toggle); tap any day for a detail panel
+  (per-habit completion status + a done/total summary for that date); tap a habit
+  there to open its detail. Month grid has prev/next navigation with per-month data.
 
 ---
 
