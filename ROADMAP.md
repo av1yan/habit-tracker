@@ -92,7 +92,9 @@ architecture.
   - [ ] Contrast audit against WCAG AA
 - [ ] Localization / i18n
 - [ ] Reminders robustness: reschedule on device reboot, timezone edge cases
-- [ ] Restore the full 3-step create-habit wizard (currently condensed to one form)
+- [x] Restore the full 3-step create-habit wizard — step 1 name/icon/color,
+      step 2 frequency/type/category, step 3 live-preview + build/quit, with a
+      progress bar, step counter, and forward/back nav (matches the design prototype)
 - [ ] Wire achievements into the UI
 
 ---
