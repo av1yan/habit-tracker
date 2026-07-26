@@ -5,27 +5,8 @@ import { stats as statsRepo } from '@backend/local'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
 import { EmptyState, ErrorState, Loading } from '@/components/ScreenState'
+import { STAGES, stageIndex, THRIVING } from '@/lib/garden'
 import { colors, fonts, rgba } from '@/lib/theme'
-
-// Growth stages by current streak. A plant grows the longer you keep the streak
-// alive; a broken streak leaves a dormant seed to coax back to life.
-interface Stage {
-  min: number
-  emoji: string
-  label: string
-}
-const STAGES: Stage[] = [
-  { min: 100, emoji: '🌳', label: 'Mighty' },
-  { min: 30, emoji: '🌻', label: 'Blooming' },
-  { min: 14, emoji: '🌷', label: 'Flowering' },
-  { min: 7, emoji: '🪴', label: 'Thriving' },
-  { min: 3, emoji: '🌿', label: 'Sprouting' },
-  { min: 1, emoji: '🌱', label: 'Seedling' },
-  { min: 0, emoji: '🌰', label: 'Dormant' },
-]
-const stageIndex = (streak: number) => STAGES.findIndex((s) => streak >= s.min)
-
-const THRIVING = 7 // streak at which a plant is considered thriving
 
 export default function Garden() {
   useTheme()
@@ -52,11 +33,32 @@ export default function Garden() {
       style={{ flex: 1, backgroundColor: colors.bg }}
       contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 24, paddingHorizontal: 16 }}
     >
-      <View style={{ marginHorizontal: 4, marginBottom: 16 }}>
-        <Text style={{ fontSize: 26, fontFamily: fonts.display, color: colors.ink }}>Garden</Text>
-        {subtitle ? (
-          <Text style={{ fontSize: 13, fontFamily: fonts.body, color: colors.sub, marginTop: 3 }}>{subtitle}</Text>
-        ) : null}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 4, marginBottom: 16 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 26, fontFamily: fonts.display, color: colors.ink }}>Garden</Text>
+          {subtitle ? (
+            <Text style={{ fontSize: 13, fontFamily: fonts.body, color: colors.sub, marginTop: 3 }}>{subtitle}</Text>
+          ) : null}
+        </View>
+        {plants.length > 0 && (
+          <Pressable
+            onPress={() => router.push('/share-card')}
+            accessibilityRole="button"
+            accessibilityLabel="Share your garden"
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 5,
+              backgroundColor: colors.card,
+              borderRadius: 999,
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ fontSize: 13 }}>↗</Text>
+            <Text style={{ fontSize: 13, fontFamily: fonts.semibold, color: colors.accent }}>Share</Text>
+          </Pressable>
+        )}
       </View>
 
       {loading && <Loading />}

@@ -101,6 +101,7 @@ function Navigator() {
         <Stack.Screen name="reminders" />
         <Stack.Screen name="reminder-edit" options={{ presentation: 'modal' }} />
         <Stack.Screen name="streak-freeze" />
+        <Stack.Screen name="share-card" options={{ presentation: 'modal' }} />
       </Stack>
     </>
   )
