@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Link, useRouter } from 'expo-router'
-import { logs } from '@backend/local'
+import { logs, stats } from '@backend/local'
 import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
@@ -14,7 +14,12 @@ export default function Today() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const { local, refresh } = useApp()
-  const { data, loading, error, reload } = useLocalData((l) => logs.getToday(l))
+  const { data, loading, error, reload } = useLocalData(async (l) => {
+    const today = await logs.getToday(l)
+    const allStats = await stats.getAllStats(l)
+    const streaks = new Map(allStats.map((s) => [s.habit_id, s.current_streak]))
+    return { ...today, streaks }
+  })
 
   const greeting = (() => {
     const h = new Date().getHours()
@@ -110,7 +115,7 @@ export default function Today() {
           />
         )}
         {(data?.habits ?? []).map(({ habit, done }) => {
-          const badge = streakBadge(0)
+          const badge = streakBadge(data?.streaks.get(habit.id) ?? 0)
           return (
             <Pressable
               key={habit.id}

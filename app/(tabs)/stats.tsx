@@ -4,7 +4,8 @@ import { stats as statsRepo } from '@backend/local'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
 import { EmptyState, ErrorState, Loading } from '@/components/ScreenState'
-import { colors, fonts } from '@/lib/theme'
+import { deriveAchievements, earnedCount, type AchievementView } from '@/lib/achievements'
+import { colors, fonts, rgba } from '@/lib/theme'
 
 export default function Stats() {
   useTheme()
@@ -17,6 +18,7 @@ export default function Stats() {
   const perHabit = data?.perHabit ?? []
   const bestStreak = perHabit.reduce((m, s) => Math.max(m, s.longest_streak), 0)
   const totalDone = perHabit.reduce((m, s) => m + s.total_completions, 0)
+  const achievements = deriveAchievements({ bestStreak, totalDone, habitCount: perHabit.length })
 
   return (
     <ScrollView
@@ -71,9 +73,68 @@ export default function Stats() {
         <Stat label="best streak" value={bestStreak} color={colors.accent} />
         <Stat label="total done" value={totalDone} color={colors.green} />
       </View>
+
+      <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 16 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <Text style={{ fontSize: 11, fontFamily: fonts.semibold, letterSpacing: 1, color: colors.muted }}>
+            ACHIEVEMENTS
+          </Text>
+          <Text style={{ fontSize: 11, fontFamily: fonts.semibold, color: colors.muted }}>
+            {earnedCount(achievements)} of {achievements.length} earned
+          </Text>
+        </View>
+        <View style={{ gap: 14 }}>
+          {achievements.map((a) => (
+            <AchievementRow key={a.kind} a={a} />
+          ))}
+        </View>
+      </View>
         </>
       )}
     </ScrollView>
+  )
+}
+
+function AchievementRow({ a }: { a: AchievementView }) {
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${a.title}, ${a.goal}. ${a.earned ? 'Achieved' : a.detail}`}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 12, opacity: a.earned ? 1 : 0.55 }}
+    >
+      <View
+        style={{
+          width: 42,
+          height: 42,
+          borderRadius: 12,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: a.earned ? rgba(colors.accent, 0.15) : colors.card,
+        }}
+      >
+        <Text style={{ fontSize: 22 }}>{a.icon}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 14, fontFamily: fonts.semibold, color: colors.ink }}>{a.title}</Text>
+        <Text style={{ fontSize: 12, color: colors.muted, marginTop: 1 }}>{a.goal}</Text>
+        {!a.earned && (
+          <View style={{ height: 5, backgroundColor: colors.card, borderRadius: 999, overflow: 'hidden', marginTop: 6 }}>
+            <View style={{ height: 5, borderRadius: 999, backgroundColor: colors.accent, width: `${a.progress * 100}%` }} />
+          </View>
+        )}
+      </View>
+      <Text
+        style={{
+          fontSize: 12,
+          fontFamily: fonts.semibold,
+          color: a.earned ? colors.green : colors.muted,
+          maxWidth: 96,
+          textAlign: 'right',
+        }}
+      >
+        {a.detail}
+      </Text>
+    </View>
   )
 }
 

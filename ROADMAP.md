@@ -95,7 +95,11 @@ architecture.
 - [x] Restore the full 3-step create-habit wizard — step 1 name/icon/color,
       step 2 frequency/type/category, step 3 live-preview + build/quit, with a
       progress bar, step counter, and forward/back nav (matches the design prototype)
-- [ ] Wire achievements into the UI
+- [x] Wire achievements into the UI — Achievements section on Stats (6 milestones:
+      streak ⭐/🏆/💎 + completion-count tiers, earned/locked with progress bars)
+      and per-habit ⭐ streak badges on Today. Derived live from stats via
+      `lib/achievements.ts`; the `achievements` table remains for a future
+      one-time celebration toast with earned-dates.
 
 ---
 
