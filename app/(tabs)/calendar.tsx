@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { PanResponder, Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { logs as logsRepo, stats as statsRepo } from '@backend/local'
@@ -226,8 +226,23 @@ function MonthGrid({
   const cursorMonth = monthOf(monthCursor)
   const atCurrentMonth = cursorMonth >= monthOf(today)
 
+  // Swipe left/right to change month. A ref holds the latest bound + callbacks
+  // so the responder (created once) never acts on stale values.
+  const latest = useRef({ atCurrentMonth, onPrev, onNext })
+  latest.current = { atCurrentMonth, onPrev, onNext }
+  const pan = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_e, g) => Math.abs(g.dx) > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 1.5,
+      onPanResponderRelease: (_e, g) => {
+        const l = latest.current
+        if (g.dx > 45) l.onPrev()
+        else if (g.dx < -45 && !l.atCurrentMonth) l.onNext()
+      },
+    }),
+  ).current
+
   return (
-    <View style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 16, gap: 12 }}>
+    <View {...pan.panHandlers} style={{ marginHorizontal: 16, backgroundColor: colors.surface, borderRadius: 16, padding: 16, gap: 12 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Pressable onPress={onPrev} hitSlop={10} accessibilityRole="button" accessibilityLabel="Previous month">
           <Text style={{ fontSize: 22, color: colors.accent }}>‹</Text>
