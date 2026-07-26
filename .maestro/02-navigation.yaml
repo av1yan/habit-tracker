@@ -1,0 +1,25 @@
+# Smoke: navigate the four tabs and confirm each screen renders.
+appId: com.av1yan.habittracker
+---
+- launchApp
+- runFlow:
+    when:
+      visible: 'Sign in'
+    commands:
+      - tapOn: 'Email'
+      - inputText: ${EMAIL}
+      - tapOn: 'Password'
+      - inputText: ${PASSWORD}
+      - hideKeyboard
+      - tapOn: 'Sign in'
+- assertVisible:
+    text: 'habits today'
+    timeout: 30000
+- tapOn: 'Calendar'
+- assertVisible: 'LAST 15 WEEKS'
+- tapOn: 'Stats'
+- assertVisible: 'Your Stats'
+- tapOn: 'Profile'
+- assertVisible: 'Streak Freeze'
+- tapOn: 'Today'
+- assertVisible: "TODAY'S HABITS"

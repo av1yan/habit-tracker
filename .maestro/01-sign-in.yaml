@@ -1,0 +1,18 @@
+# Smoke: sign in with the demo account and land on Today.
+appId: com.av1yan.habittracker
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    text: 'Habits'
+    timeout: 30000
+- tapOn: 'Email'
+- inputText: ${EMAIL}
+- tapOn: 'Password'
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn: 'Sign in'
+- assertVisible:
+    text: 'habits today'
+    timeout: 30000
+- assertVisible: "TODAY'S HABITS"

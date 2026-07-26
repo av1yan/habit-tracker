@@ -1,0 +1,12 @@
+# Maestro E2E config — https://maestro.mobile.dev
+#
+# Flows target a standalone build (appId com.av1yan.habittracker). Run them
+# against a dev or preview build:
+#   eas build --profile preview        # or: npx expo run:ios
+#   maestro test .maestro
+#
+# Demo credentials come from supabase/seed.sql (a throwaway account). Override:
+#   maestro test -e EMAIL=you@example.com -e PASSWORD=... .maestro
+env:
+  EMAIL: demo@habittracker.app
+  PASSWORD: password123

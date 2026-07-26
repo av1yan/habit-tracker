@@ -59,7 +59,9 @@ architecture.
 - [x] Tests for the DAL (mock Supabase client) and local repos (real node:sqlite) —
       ~29 new tests, 44 total via `npm test`
 - [x] CI pipeline — GitHub Actions runs backend + app typecheck and all tests on push/PR
-- [ ] E2E smoke tests (Maestro or Detox) for core flows
+- [x] E2E smoke flows (Maestro, `.maestro/`) — sign-in, navigation, create-habit,
+      theme. Run against a dev/preview build (see `.maestro/README.md`).
+- [ ] Execute the E2E flows against a build + wire into CI (needs Java/Maestro + a build)
 
 **Observability**
 - [x] Crash/error reporting (Sentry via `lib/monitoring.ts` — inert without a DSN,

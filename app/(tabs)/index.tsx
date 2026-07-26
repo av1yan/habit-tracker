@@ -43,6 +43,7 @@ export default function Today() {
         </View>
         <Link href="/new-habit" asChild>
           <Pressable
+            accessibilityLabel="Add habit"
             style={{
               width: 40,
               height: 40,

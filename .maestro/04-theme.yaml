@@ -1,0 +1,21 @@
+# Smoke: switch appearance to Dark from Profile (must not crash).
+appId: com.av1yan.habittracker
+---
+- launchApp
+- runFlow:
+    when:
+      visible: 'Sign in'
+    commands:
+      - tapOn: 'Email'
+      - inputText: ${EMAIL}
+      - tapOn: 'Password'
+      - inputText: ${PASSWORD}
+      - hideKeyboard
+      - tapOn: 'Sign in'
+- assertVisible:
+    text: 'habits today'
+    timeout: 30000
+- tapOn: 'Profile'
+- assertVisible: 'Appearance'
+- tapOn: 'Dark'
+- assertVisible: 'Appearance'

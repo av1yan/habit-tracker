@@ -1,0 +1,24 @@
+# Smoke: create a habit and see it appear on Today.
+appId: com.av1yan.habittracker
+---
+- launchApp
+- runFlow:
+    when:
+      visible: 'Sign in'
+    commands:
+      - tapOn: 'Email'
+      - inputText: ${EMAIL}
+      - tapOn: 'Password'
+      - inputText: ${PASSWORD}
+      - hideKeyboard
+      - tapOn: 'Sign in'
+- assertVisible:
+    text: 'habits today'
+    timeout: 30000
+- tapOn: 'Add habit'
+- assertVisible: 'New Habit'
+- tapOn: 'e.g. Morning Run'
+- inputText: 'E2E Smoke Habit'
+- hideKeyboard
+- tapOn: 'Add Habit'
+- assertVisible: 'E2E Smoke Habit'
