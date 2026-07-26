@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
 import { logs as logsRepo, stats as statsRepo } from '@backend/local'
 import type { TodayView } from '@backend/data'
 import { addDays, startOfWeek, toLocalISODate } from '@backend/data'
@@ -25,6 +26,7 @@ export default function Calendar() {
   useTheme()
   const insets = useSafeAreaInsets()
   const { local, version } = useApp()
+  const router = useRouter()
   const { data, loading } = useLocalData((l) => statsRepo.recentHeatmap(l, WEEKS))
 
   const counts = new Map((data ?? []).map((c) => [c.log_date, c.completions]))
@@ -130,9 +132,12 @@ export default function Calendar() {
         ) : (
           <View style={{ gap: 10 }}>
             {day.habits.map(({ habit, done }) => (
-              <View
+              <Pressable
                 key={habit.id}
+                onPress={() => router.push(`/habit/${habit.id}`)}
+                accessibilityRole="button"
                 accessibilityLabel={`${habit.name}, ${done ? 'completed' : 'not completed'}`}
+                accessibilityHint="Opens habit details"
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
               >
                 <View
@@ -167,7 +172,7 @@ export default function Calendar() {
                 >
                   {done && <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>✓</Text>}
                 </View>
-              </View>
+              </Pressable>
             ))}
           </View>
         )}
