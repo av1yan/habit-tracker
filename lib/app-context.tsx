@@ -10,6 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
+import { AppState as RNAppState } from 'react-native'
 import NetInfo from '@react-native-community/netinfo'
 import * as Linking from 'expo-linking'
 import { useRouter } from 'expo-router'
@@ -18,7 +19,7 @@ import { supabase } from './supabase'
 import { createExpoAdapter } from '@backend/local'
 import type { LocalDB } from '@backend/local'
 import { bootstrapOffline, onSignIn, onSignOut, type OfflineStack } from '@backend/offline'
-import { rescheduleReminders } from './notifications'
+import { rescheduleOnForeground, rescheduleReminders } from './notifications'
 import { backfillAchievements } from './achievements'
 import { captureError } from './monitoring'
 
@@ -135,6 +136,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const sub = Linking.addEventListener('url', (e) => handleUrl(e.url))
     return () => sub.remove()
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // When the app returns to the foreground, reschedule reminders if the
+  // timezone or day changed while it was away — covers travel across timezones,
+  // DST shifts, and a reboot the user opened the app after.
+  useEffect(() => {
+    const sub = RNAppState.addEventListener('change', (state) => {
+      const l = stackRef.current?.local
+      if (state === 'active' && l && lastUser.current) {
+        rescheduleOnForeground(l).catch(() => {})
+      }
+    })
+    return () => sub.remove()
   }, [])
 
   const signOut = useCallback(async () => {

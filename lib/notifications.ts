@@ -8,6 +8,7 @@
 import * as Notifications from 'expo-notifications'
 import { habits as habitsRepo, reminders as remindersRepo } from '@backend/local'
 import type { Habit, LocalDB } from '@backend/local'
+import { toLocalISODate } from '@backend/data'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -81,10 +82,33 @@ export async function rescheduleReminders(local: LocalDB): Promise<number> {
         }
       }
     }
+    // Record the context these notifications were scheduled in, so a later
+    // timezone change or new day can be detected (see rescheduleOnForeground).
+    lastScheduledTzOffset = new Date().getTimezoneOffset()
+    lastScheduledDay = toLocalISODate()
     return scheduled
   } catch {
     return 0
   }
+}
+
+// Context of the last successful schedule, for change detection.
+let lastScheduledTzOffset: number | null = null
+let lastScheduledDay: string | null = null
+
+/**
+ * Reschedule only if the device timezone or calendar day has changed since the
+ * last schedule — cheap no-op otherwise. Call when the app returns to the
+ * foreground so reminders follow the user across timezones (their local
+ * hour:minute stays correct) and survive reboots/DST shifts. Returns true if a
+ * reschedule actually happened.
+ */
+export async function rescheduleOnForeground(local: LocalDB): Promise<boolean> {
+  const tzOffset = new Date().getTimezoneOffset()
+  const day = toLocalISODate()
+  if (tzOffset === lastScheduledTzOffset && day === lastScheduledDay) return false
+  await rescheduleReminders(local)
+  return true
 }
 
 /** Count of currently-scheduled notifications (for the reminders screen). */
