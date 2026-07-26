@@ -6,6 +6,8 @@
 // (`longest_streak` and total completions only ever grow, so an earned
 // milestone never un-earns.)
 
+import { stats as statsRepo, achievements as achievementsRepo, type LocalDB } from '@backend/local'
+
 export interface AchievementMetrics {
   /** Best streak ever reached across all habits. */
   bestStreak: number
@@ -68,4 +70,45 @@ export function deriveAchievements(m: AchievementMetrics): AchievementView[] {
 
 export function earnedCount(views: AchievementView[]): number {
   return views.filter((v) => v.earned).length
+}
+
+// -- Persistence orchestration ----------------------------------------------
+//
+// The display above is derived purely from stats and is always correct. These
+// helpers additionally *record* earned milestones (in the synced `achievements`
+// table) so each one can be celebrated exactly once, the first time it's
+// crossed.
+
+export async function metricsFromLocal(local: LocalDB): Promise<AchievementMetrics> {
+  const perHabit = await statsRepo.getAllStats(local)
+  return {
+    bestStreak: perHabit.reduce((m, s) => Math.max(m, s.longest_streak), 0),
+    totalDone: perHabit.reduce((m, s) => m + s.total_completions, 0),
+    habitCount: perHabit.length,
+  }
+}
+
+/**
+ * Record every currently-earned milestone without returning anything to
+ * celebrate. Run once on sign-in so a user's existing progress is captured
+ * silently — only milestones crossed *afterwards* trigger a toast.
+ */
+export async function backfillAchievements(local: LocalDB): Promise<void> {
+  const views = deriveAchievements(await metricsFromLocal(local))
+  for (const v of views) {
+    if (v.earned) await achievementsRepo.award(local, v.kind)
+  }
+}
+
+/**
+ * Award any newly-earned milestones and return them, so the caller can
+ * celebrate. Call after an action that can advance progress (completing a
+ * habit). Idempotent: a milestone already recorded is never returned again.
+ */
+export async function checkForNewAchievements(local: LocalDB): Promise<AchievementView[]> {
+  const views = deriveAchievements(await metricsFromLocal(local))
+  const already = await achievementsRepo.earnedKinds(local)
+  const newly = views.filter((v) => v.earned && !already.has(v.kind))
+  for (const v of newly) await achievementsRepo.award(local, v.kind)
+  return newly
 }

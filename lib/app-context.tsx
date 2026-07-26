@@ -19,6 +19,7 @@ import { createExpoAdapter } from '@backend/local'
 import type { LocalDB } from '@backend/local'
 import { bootstrapOffline, onSignIn, onSignOut, type OfflineStack } from '@backend/offline'
 import { rescheduleReminders } from './notifications'
+import { backfillAchievements } from './achievements'
 import { captureError } from './monitoring'
 
 interface AppState {
@@ -58,6 +59,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         await onSignIn(stack.local, stack.engine, uid)
         // Reschedule local notifications from the freshly-synced reminders.
         rescheduleReminders(stack.local).catch(() => {})
+        // Record already-earned milestones silently, so only milestones crossed
+        // from here on trigger a celebration toast.
+        backfillAchievements(stack.local).catch(() => {})
       } else {
         await onSignOut(stack.local, stack.engine)
       }

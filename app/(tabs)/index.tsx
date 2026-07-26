@@ -5,6 +5,8 @@ import { logs, stats } from '@backend/local'
 import { useApp } from '@/lib/app-context'
 import { useLocalData } from '@/lib/useLocalData'
 import { useTheme } from '@/lib/theme-context'
+import { checkForNewAchievements } from '@/lib/achievements'
+import { useAchievementToast } from '@/lib/achievement-toast'
 import { Ring } from '@/components/Ring'
 import { EmptyState, ErrorState, Loading } from '@/components/ScreenState'
 import { colors, fonts, rgba, streakBadge } from '@/lib/theme'
@@ -14,6 +16,7 @@ export default function Today() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const { local, refresh } = useApp()
+  const { celebrate } = useAchievementToast()
   const { data, loading, error, reload } = useLocalData(async (l) => {
     const today = await logs.getToday(l)
     const allStats = await stats.getAllStats(l)
@@ -35,6 +38,8 @@ export default function Today() {
     if (!local) return
     await logs.toggleHabit(local, habitId)
     refresh()
+    // Celebrate any milestone this completion just crossed (no-op otherwise).
+    checkForNewAchievements(local).then(celebrate).catch(() => {})
   }
 
   return (

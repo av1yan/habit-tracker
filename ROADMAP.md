@@ -98,8 +98,10 @@ architecture.
 - [x] Wire achievements into the UI — Achievements section on Stats (6 milestones:
       streak ⭐/🏆/💎 + completion-count tiers, earned/locked with progress bars)
       and per-habit ⭐ streak badges on Today. Derived live from stats via
-      `lib/achievements.ts`; the `achievements` table remains for a future
-      one-time celebration toast with earned-dates.
+      `lib/achievements.ts`. Earned milestones are also persisted (synced
+      `achievements` table) and celebrated once with an animated toast
+      (`lib/achievement-toast.tsx`) — existing progress is backfilled silently
+      on sign-in, so only milestones crossed afterwards pop a toast.
 
 ---
 

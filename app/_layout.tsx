@@ -13,6 +13,7 @@ import {
   Figtree_800ExtraBold,
 } from '@expo-google-fonts/figtree'
 import { AppProvider } from '@/lib/app-context'
+import { AchievementToastProvider } from '@/lib/achievement-toast'
 import { ThemeProvider, useTheme } from '@/lib/theme-context'
 import { colors } from '@/lib/theme'
 import { captureError, initMonitoring } from '@/lib/monitoring'
@@ -111,7 +112,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AppProvider>
         <ThemeProvider>
-          <Navigator />
+          <AchievementToastProvider>
+            <Navigator />
+          </AchievementToastProvider>
         </ThemeProvider>
       </AppProvider>
     </SafeAreaProvider>
