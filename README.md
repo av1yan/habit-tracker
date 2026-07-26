@@ -94,4 +94,4 @@ npm run typecheck:app      # typecheck the Expo app (after npm install)
 
 ## License
 
-[MIT](LICENSE) © 2026 av1yan
+[MIT](LICENSE) © 2026 Av1yan
