@@ -59,45 +59,60 @@ const distSeg = (px, py, ax, ay, bx, by) => {
   t = Math.max(0, Math.min(1, t))
   return Math.hypot(px - (ax + t * dx), py - (ay + t * dy))
 }
-const render = (size, bg, stroke, scale) => {
+// Gradient endpoints for the icon background (subtle top→bottom warmth).
+const ORANGE_TOP = hex('#d07f43')
+const ORANGE_BOT = hex('#a85e2c')
+const lerp = (a, b, t) => a + (b - a) * t
+const mix = (c1, c2, t) => [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)]
+
+// Layered render: vertical-gradient background + faint centered disc + a
+// rounded (capsule) checkmark. Transparent variants skip the bg/disc.
+const render = (size, { opaque, stroke, scale, disc = false }) => {
   const buf = Buffer.alloc(size * size * 4)
   const sc = (p) => [0.5 + (p[0] - 0.5) * scale, 0.5 + (p[1] - 0.5) * scale]
-  const A = sc([0.27, 0.53])
-  const B = sc([0.44, 0.67])
-  const C = sc([0.74, 0.35])
-  const half = (0.12 * scale) / 2
+  const A = sc([0.28, 0.52])
+  const B = sc([0.44, 0.66])
+  const C = sc([0.74, 0.34])
+  const half = (0.135 * scale) / 2 // slightly bolder stroke
   const aa = 1.6 / size
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const nx = (x + 0.5) / size
       const ny = (y + 0.5) / size
       const d = Math.min(distSeg(nx, ny, A[0], A[1], B[0], B[1]), distSeg(nx, ny, B[0], B[1], C[0], C[1]))
-      const a = Math.max(0, Math.min(1, 0.5 + (half - d) / aa))
+      const checkA = Math.max(0, Math.min(1, 0.5 + (half - d) / aa))
       const i = (y * size + x) * 4
-      if (bg) {
-        buf[i] = Math.round(stroke[0] * a + bg[0] * (1 - a))
-        buf[i + 1] = Math.round(stroke[1] * a + bg[1] * (1 - a))
-        buf[i + 2] = Math.round(stroke[2] * a + bg[2] * (1 - a))
+      if (opaque) {
+        let col = mix(ORANGE_TOP, ORANGE_BOT, ny) // vertical gradient
+        if (disc) {
+          const dc = Math.hypot(nx - 0.5, ny - 0.5)
+          const discA = Math.max(0, Math.min(1, 0.5 + (0.34 - dc) / aa)) * 0.16
+          col = mix(col, CREAM, discA) // faint cream disc behind the mark
+        }
+        col = mix(col, stroke, checkA)
+        buf[i] = Math.round(col[0])
+        buf[i + 1] = Math.round(col[1])
+        buf[i + 2] = Math.round(col[2])
         buf[i + 3] = 255
       } else {
         buf[i] = stroke[0]
         buf[i + 1] = stroke[1]
         buf[i + 2] = stroke[2]
-        buf[i + 3] = Math.round(a * 255)
+        buf[i + 3] = Math.round(checkA * 255)
       }
     }
   }
   return buf
 }
 
-const write = (name, size, bg, stroke, scale) => {
-  fs.writeFileSync(`${OUT}/${name}`, encodePNG(size, render(size, bg, stroke, scale)))
+const write = (name, size, opts) => {
+  fs.writeFileSync(`${OUT}/${name}`, encodePNG(size, render(size, opts)))
   console.log('wrote', `${OUT}/${name}`, `${size}x${size}`)
 }
 
-// iOS icon: opaque orange background + cream check (no transparency allowed)
-write('icon.png', 1024, ORANGE, CREAM, 1.0)
-// Android adaptive foreground: transparent, cream check within the safe zone
-write('adaptive-icon.png', 1024, null, CREAM, 0.72)
-// Splash logo: transparent, orange check shown on the cream splash background
-write('splash-icon.png', 1024, null, ORANGE, 0.42)
+// iOS icon: gradient orange bg + faint disc + cream check (opaque — no alpha).
+write('icon.png', 1024, { opaque: true, stroke: CREAM, scale: 1.0, disc: true })
+// Android adaptive foreground: transparent cream check within the safe zone.
+write('adaptive-icon.png', 1024, { opaque: false, stroke: CREAM, scale: 0.72 })
+// Splash logo: transparent orange check shown on the cream splash background.
+write('splash-icon.png', 1024, { opaque: false, stroke: ORANGE, scale: 0.42 })
