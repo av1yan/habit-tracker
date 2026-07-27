@@ -27,9 +27,21 @@
         "backgroundColor": "#c67139"
       }
     },
-    "plugins": ["expo-router", "expo-apple-authentication"],
+    "plugins": [
+      "expo-router",
+      "expo-apple-authentication"
+    ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d19f4628-4166-4bda-8b58-989d2e71621c"
+      }
+    },
+    "owner": "av1yan"
   }
 }
