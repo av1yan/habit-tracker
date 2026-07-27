@@ -30,7 +30,8 @@ later steps depend on earlier ones.
 
 ## 3. Build
 
-- [ ] `eas login && eas init` (links the project, writes `extra.eas.projectId`).
+- [ ] `npx eas-cli login && npx eas-cli init` (links the project, writes
+      `extra.eas.projectId`). No global install needed — the npm scripts use `npx`.
 - [ ] `npm run build:ios` (production profile). EAS registers the app on your
       Apple account and provisions signing automatically.
 

@@ -94,14 +94,16 @@ Build config lives in [`eas.json`](eas.json). Build servers are pinned to Node 2
 (`node` field per profile) to avoid the Node-26 config-load issue seen in dev.
 
 **Prerequisites**
-- An [Expo account](https://expo.dev) (free) and `eas-cli`: `npm install -g eas-cli`
+- An [Expo account](https://expo.dev) (free). No global install needed — the npm
+  scripts call `npx eas-cli`. (A global `npm install -g eas-cli` also works if you
+  have write access to the npm prefix; otherwise `npx` avoids the sudo requirement.)
 - Run on **Node 20** locally (`.nvmrc` pins it; `nvm use`)
 - Apple Developer + Google Play accounts for store submission
 
 **First-time setup**
 ```bash
-eas login
-eas init          # links the project and writes extra.eas.projectId into app.json
+npx eas-cli login
+npx eas-cli init   # links the project and writes extra.eas.projectId into app.json
 ```
 
 **Build profiles** (`eas.json`)
@@ -117,10 +119,10 @@ A dev build compiles the native modules that Expo Go doesn't bundle
 so it needs only a free Expo account — no Apple Developer membership.
 
 ```bash
-eas login                                              # your Expo account
-eas init                                               # once, links the project
-eas build --profile development --platform ios         # cloud build (~10–20 min)
-eas build:run -p ios                                   # install the .app to a booted simulator
+npx eas-cli login                                      # your Expo account
+npx eas-cli init                                       # once, links the project
+npx eas-cli build --profile development --platform ios # cloud build (~10–20 min)
+npx eas-cli build:run -p ios                           # install the .app to a booted simulator
 npx expo start --dev-client                            # then open the dev-client app
 ```
 

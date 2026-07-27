@@ -18,11 +18,11 @@
     "typecheck:app": "tsc --noEmit -p tsconfig.json",
     "test": "node --import tsx --test src/sync/sync.test.ts src/data/dal.test.ts src/local/repos.test.ts",
     "build:legal": "node scripts/build-legal-html.mjs",
-    "build:preview": "eas build --profile preview",
-    "build:ios": "eas build --profile production --platform ios",
-    "build:android": "eas build --profile production --platform android",
-    "submit:ios": "eas submit --profile production --platform ios",
-    "submit:android": "eas submit --profile production --platform android"
+    "build:preview": "npx eas-cli build --profile preview",
+    "build:ios": "npx eas-cli build --profile production --platform ios",
+    "build:android": "npx eas-cli build --profile production --platform android",
+    "submit:ios": "npx eas-cli submit --profile production --platform ios",
+    "submit:android": "npx eas-cli submit --profile production --platform android"
   },
   "dependencies": {
     "@expo-google-fonts/caprasimo": "^0.4.0",
