@@ -1,15 +1,8 @@
-<!--
-  TEMPLATE — NOT LEGAL ADVICE.
-  Have this reviewed by a qualified attorney and replace every [BRACKET] before
-  publishing. Both the App Store and Google Play require this document to be
-  hosted at a public URL and linked from your store listing and the app.
--->
-
 # Privacy Policy
 
-**Last updated: [DATE]**
+**Last updated: July 27, 2026**
 
-This Privacy Policy explains how [LEGAL NAME / DEVELOPER NAME] (“we”, “us”, “our”)
+This Privacy Policy explains how Av1yan (“we”, “us”, “our”)
 collects, uses, shares, and protects your information when you use the Habit
 Tracker mobile application (the “App”). By using the App you agree to this Policy.
 
@@ -95,7 +88,7 @@ withdraw consent. You can:
 - **Edit** your habits, notes, reminders, and profile directly in the App
 - **Delete** your account and data via **Profile → Delete account**
 - **Request access or a copy** of your data, or make any other privacy request, by
-  contacting us at **[CONTACT EMAIL]**
+  contacting us at **av1yan.ad@gmail.com**
 
 **California residents (CCPA/CPRA):** we do not “sell” or “share” personal
 information as those terms are defined, and you have the right to know, delete, and
@@ -127,6 +120,5 @@ above and, for material changes, provide a more prominent notice.
 
 ## 12. Contact us
 
-[LEGAL NAME / DEVELOPER NAME]
-[CONTACT EMAIL]
-[MAILING ADDRESS, if applicable]
+Av1yan
+av1yan.ad@gmail.com

@@ -1,15 +1,9 @@
-<!--
-  TEMPLATE — NOT LEGAL ADVICE.
-  Have this reviewed by a qualified attorney and replace every [BRACKET] before
-  publishing. Host it at a public URL and link it from your store listing.
--->
-
 # Terms of Service
 
-**Last updated: [DATE]**
+**Last updated: July 27, 2026**
 
 These Terms of Service (“Terms”) govern your use of the Habit Tracker mobile
-application (the “App”) provided by [LEGAL NAME / DEVELOPER NAME] (“we”, “us”,
+application (the “App”) provided by Av1yan (“we”, “us”,
 “our”). By downloading or using the App, you agree to these Terms. If you do not
 agree, do not use the App.
 
@@ -87,7 +81,7 @@ TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE WILL NOT BE LIABLE FOR ANY INDIRECT,
 INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF DATA, PROFITS,
 OR GOODWILL, ARISING FROM YOUR USE OF THE APP. OUR TOTAL LIABILITY FOR ANY CLAIM
 RELATING TO THE APP WILL NOT EXCEED THE GREATER OF THE AMOUNT YOU PAID US IN THE
-[12] MONTHS BEFORE THE CLAIM OR [USD 50]. Some jurisdictions do not allow these
+12 MONTHS BEFORE THE CLAIM OR USD 50. Some jurisdictions do not allow these
 limitations, so they may not fully apply to you.
 
 ## 11. Termination
@@ -106,11 +100,11 @@ changes take effect means you accept the updated Terms.
 
 ## 13. Governing law and disputes
 
-These Terms are governed by the laws of [JURISDICTION / STATE / COUNTRY], without
+These Terms are governed by the laws of the State of Oklahoma, USA, without
 regard to its conflict-of-laws rules. Any disputes will be resolved in the courts
-located in [VENUE], unless applicable law requires otherwise.
+located in Oklahoma, USA, unless applicable law requires otherwise.
 
 ## 14. Contact us
 
-[LEGAL NAME / DEVELOPER NAME]
-[CONTACT EMAIL]
+Av1yan
+av1yan.ad@gmail.com
