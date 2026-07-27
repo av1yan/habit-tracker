@@ -36,8 +36,10 @@ export default function ShareCard() {
 
   const habits = data?.perHabit ?? []
   const overall = data?.overall ?? 0
-  const bestStreak = habits.reduce((m, h) => Math.max(m, h.current_streak), 0)
-  const bestHabit = habits.find((h) => h.current_streak === bestStreak)
+  // All-time best (longest) streak — the number worth flexing, so it stays
+  // impressive even on a day nothing's checked off yet.
+  const bestStreak = habits.reduce((m, h) => Math.max(m, h.longest_streak), 0)
+  const bestHabit = habits.find((h) => h.longest_streak === bestStreak)
   const thriving = habits.filter((h) => h.current_streak >= THRIVING).length
   const checkins = habits.reduce((a, h) => a + h.total_completions, 0)
 
