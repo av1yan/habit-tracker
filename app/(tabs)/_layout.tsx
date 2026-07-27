@@ -1,10 +1,10 @@
 import { Redirect, Tabs } from 'expo-router'
-import { Text } from 'react-native'
+import { type ColorValue, Text } from 'react-native'
 import { useApp } from '@/lib/app-context'
 import { useTheme } from '@/lib/theme-context'
 import { colors, fonts } from '@/lib/theme'
 
-function Icon({ emoji, color }: { emoji: string; color: string }) {
+function Icon({ emoji, color }: { emoji: string; color: ColorValue }) {
   return <Text style={{ fontSize: 20, color }}>{emoji}</Text>
 }
 

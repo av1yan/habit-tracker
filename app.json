@@ -7,11 +7,6 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#f5ead8"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.av1yan.habittracker",
@@ -29,7 +24,15 @@
     },
     "plugins": [
       "expo-router",
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#f5ead8"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
