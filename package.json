@@ -4,6 +4,11 @@
   "private": true,
   "license": "MIT",
   "main": "expo-router/entry",
+  "expo": {
+    "install": {
+      "exclude": ["typescript"]
+    }
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
