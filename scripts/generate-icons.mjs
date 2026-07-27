@@ -70,10 +70,10 @@ const mix = (c1, c2, t) => [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c
 const render = (size, { opaque, stroke, scale, disc = false }) => {
   const buf = Buffer.alloc(size * size * 4)
   const sc = (p) => [0.5 + (p[0] - 0.5) * scale, 0.5 + (p[1] - 0.5) * scale]
-  const A = sc([0.28, 0.52])
-  const B = sc([0.44, 0.66])
-  const C = sc([0.74, 0.34])
-  const half = (0.135 * scale) / 2 // slightly bolder stroke
+  const A = sc([0.30, 0.52])
+  const B = sc([0.45, 0.645])
+  const C = sc([0.70, 0.37])
+  const half = (0.13 * scale) / 2 // slightly bolder stroke
   const aa = 1.6 / size
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -86,7 +86,7 @@ const render = (size, { opaque, stroke, scale, disc = false }) => {
         let col = mix(ORANGE_TOP, ORANGE_BOT, ny) // vertical gradient
         if (disc) {
           const dc = Math.hypot(nx - 0.5, ny - 0.5)
-          const discA = Math.max(0, Math.min(1, 0.5 + (0.34 - dc) / aa)) * 0.16
+          const discA = Math.max(0, Math.min(1, 0.5 + (0.38 - dc) / aa)) * 0.16
           col = mix(col, CREAM, discA) // faint cream disc behind the mark
         }
         col = mix(col, stroke, checkA)
