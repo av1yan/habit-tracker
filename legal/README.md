@@ -18,6 +18,17 @@ for the Habit Tracker app.
    - liability figures in Terms §10
 2. Remove the `<!-- TEMPLATE … -->` comment at the top of each file.
 3. Confirm the sub-processor list still matches what you actually use.
-4. **Host both at public URLs** (e.g. GitHub Pages, or your website). Both stores
-   require a reachable Privacy Policy URL in the listing; add both links in-app too
-   (a good spot: the Profile screen).
+4. Regenerate the hosted HTML: `npm run build:legal` (writes `docs/privacy.html`
+   and `docs/terms.html` from these markdown files).
+
+## Hosting (GitHub Pages)
+
+The markdown here is the source of truth; `npm run build:legal` renders it to
+styled HTML in `docs/`, which the app already links to (see `lib/legal.ts`):
+
+- https://av1yan.github.io/habit-tracker/privacy.html
+- https://av1yan.github.io/habit-tracker/terms.html
+
+**One-time toggle to make those URLs live:** GitHub → repo **Settings → Pages →
+Build and deployment → Source: Deploy from a branch → Branch: `main` / `/docs`**,
+then Save. In-app links are already wired on the Profile screen.

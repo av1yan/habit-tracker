@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.backend.json",
     "typecheck:app": "tsc --noEmit -p tsconfig.json",
     "test": "node --import tsx --test src/sync/sync.test.ts src/data/dal.test.ts src/local/repos.test.ts",
+    "build:legal": "node scripts/build-legal-html.mjs",
     "build:preview": "eas build --profile preview",
     "build:ios": "eas build --profile production --platform ios",
     "build:android": "eas build --profile production --platform android",
